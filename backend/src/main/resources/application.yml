@@ -1,0 +1,10 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /backend
+spring:
+  application:
+    name: service-backend
+database:
+  schema: emulate_backend
+

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.emulate</groupId>
+	<artifactId>emulate</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<description>pom</description>
+	<parent>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-cloud-starter-parent</artifactId>
+		<version>Hoxton.SR3</version>
+		<relativePath/>
+	</parent>
+	<properties>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Hoxton.SR3</spring-cloud.version>
+		<!--Swagger Resources-->
+		<knife4j.version>2.0.8</knife4j.version>
+		<swagger.version>1.5.21</swagger.version>
+		<sharding.version>4.1.1</sharding.version>
+		<mybitis-plaus.version>3.1.1</mybitis-plaus.version>
+		<com.alibaba.version>1.2.6</com.alibaba.version>
+		<cn.hutool.version>5.7.3</cn.hutool.version>
+		<net.logstash.logback.version>6.6</net.logstash.logback.version>
+		<com.auth0.version>3.8.1</com.auth0.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-dependencies</artifactId>
+			<version>${spring-cloud.version}</version>
+			<type>pom</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-alibaba-nacos-discovery</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-alibaba-nacos-config</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<modules>
+		<module>master</module>
+		<module>gateway</module>
+		<module>tio-im</module>
+		<module>backend</module>
+	</modules>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.alibaba.cloud</groupId>
+				<artifactId>spring-cloud-alibaba-dependencies</artifactId>
+				<version>2.2.0.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.emulate</groupId>
+				<artifactId>common-core</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.xiaoymin</groupId>
+				<artifactId>knife4j-micro-spring-boot-starter</artifactId>
+				<version>${knife4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.xiaoymin</groupId>
+				<artifactId>knife4j-spring-boot-starter</artifactId>
+				<version>${knife4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.auth0</groupId>
+				<artifactId>java-jwt</artifactId>
+				<version>${com.auth0.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.logstash.logback</groupId>
+				<artifactId>logstash-logback-encoder</artifactId>
+				<version>${net.logstash.logback.version}</version>
+			</dependency>
+		</dependencies>
+
+	</dependencyManagement>
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://localhost:8081/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://localhost:8081/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>nexus Repository</name>
+			<url>http://localhost:8081/nexus/content/repositories/central/</url>
+		</repository>
+		<repository>
+			<id>releases</id>
+			<name>nexus releases</name>
+			<url>http://localhost:8081/nexus/content/repositories/releases/</url>
+		</repository>
+		<repository>
+			<id>snapshots</id>
+			<name>nexus snapshots</name>
+			<url>http://localhost:8081/nexus/content/repositories/snapshots/</url>
+		</repository>
+		<repository>
+			<id>public</id>
+			<name>nexus public</name>
+			<url>http://localhost:8081/nexus/content/repositories/public/</url>
+		</repository>
+	</repositories>
+
+</project>
+

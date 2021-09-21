@@ -1,0 +1,23 @@
+#spring:
+#  cloud:
+#    loadbalancer:
+#      ribbon:
+#        enabled: false
+
+server:
+  port: 8084
+spring:
+  application:
+
+    name: service-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: service-user
+          uri: lb://service-user
+          predicates:
+            - Path=/uc/**
+        - id:  service-backend
+          uri: lb://service-backend
+          predicates:
+            - Path=/backend/**
