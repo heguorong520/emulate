@@ -1,5 +1,6 @@
 package com.emulate.core.util;
 
+import com.emulate.core.excetion.CustomizeException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
@@ -27,12 +28,16 @@ public class AESUtil {
      * @return 加密字符串
      * @throws Exception 异常信息
      */
-    public static String encrypt(String str, String key) throws Exception {
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(keyBytes, SECRET));
-        byte[] doFinal = cipher.doFinal(str.getBytes(StandardCharsets.UTF_8));
-        return new String(Base64.getEncoder().encode(doFinal));
+    public static String encrypt(String str, String key) {
+        try {
+            Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+            byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(keyBytes, SECRET));
+            byte[] doFinal = cipher.doFinal(str.getBytes(StandardCharsets.UTF_8));
+            return new String(Base64.getEncoder().encode(doFinal));
+        }catch (Exception e){
+            throw new CustomizeException("加密失败");
+        }
     }
 
     /**
@@ -42,12 +47,16 @@ public class AESUtil {
      * @return 解密字符串
      * @throws Exception 异常信息
      */
-    public static String decrypt(String str, String key) throws Exception {
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(keyBytes, SECRET));
-        byte[] doFinal = cipher.doFinal(Base64.getDecoder().decode(str));
-        return new String(doFinal);
+    public static String decrypt(String str, String key) {
+        try {
+            Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+            byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(keyBytes, SECRET));
+            byte[] doFinal = cipher.doFinal(Base64.getDecoder().decode(str));
+            return new String(doFinal);
+        }catch (Exception e){
+            throw new CustomizeException("解密失败");
+        }
     }
     public static void main(String[] args) throws Exception {
         String str = "a1234567";

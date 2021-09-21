@@ -8,7 +8,10 @@ public enum BaseErrorEnum {
     密码错误(5004,"密码错误！"),
     不能删除(5005,"系统数据不能删除！"),
     存在子节点(5006,"请先删除子菜单"),
-    未登录(4001,"登录失效");
+    未登录(4001,"登录失效"),
+    TOKEN异常(4002,"TOKEN失效"),
+    签名异常(10001,"应用签名失败");
+
 
     BaseErrorEnum(int code, String msg){
         this.code = code;

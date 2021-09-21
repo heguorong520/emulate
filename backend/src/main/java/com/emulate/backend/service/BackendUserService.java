@@ -64,7 +64,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveUser(@Valid BackendUserDTO userDTO) throws Exception {
+    public void saveUser(@Valid BackendUserDTO userDTO) {
         BackendUserEntity user = Convert.convert(BackendUserEntity.class, userDTO);
         user.setPassword(AESUtil.encrypt(user.getPassword(), AESUtil.PASSWORD_KEY));
         this.save(user);
