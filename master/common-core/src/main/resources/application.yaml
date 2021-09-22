@@ -54,11 +54,9 @@ emulate:
   auth-sign:
     enable-sign: false
     no-sign-list:
-      - /s/**
-      - /a/s/**
-      - /s/a/**
+      - /api/s/**
+      - /api/sa/**
     enable-auth: true
     no-auth-list:
-      - /a/**
-      - /a/s/**
-      - /s/a/**
+      - /api/a/**
+      - /api/sa/**

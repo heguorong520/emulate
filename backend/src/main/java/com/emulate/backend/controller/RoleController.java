@@ -5,6 +5,7 @@ package com.emulate.backend.controller;
 import com.emulate.backend.entity.BackendRoleEntity;
 import com.emulate.backend.service.BackendRoleMenuService;
 import com.emulate.backend.service.BackendRoleService;
+import com.emulate.core.controller.BaseController;
 import com.emulate.core.result.ResultBody;
 import com.emulate.core.util.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,7 @@ import java.util.Map;
  * @author Mark sunlightcs@gmail.com
  */
 @RestController
-@RequestMapping
-public class RoleController {
+public class RoleController extends BaseController {
     @Autowired
     private BackendRoleService backendRoleService;
     @Autowired

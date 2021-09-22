@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 客户端接口过登录接口滤器
@@ -85,4 +86,5 @@ public class AuthFilter extends BaseFilter {
     public static LoginUserDTO clientLoginUserDTO() {
         return clientUser.get();
     }
+
 }

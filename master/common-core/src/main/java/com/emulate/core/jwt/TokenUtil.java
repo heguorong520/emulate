@@ -16,7 +16,7 @@ public class TokenUtil {
     private static final String TOKEN_SECRET_CLIENT = "your private key";
 
     //默认有效期30天
-    private static final long EXPIRE_TIME = 30*24*60*60;
+    private static final long EXPIRE_TIME = 7*24*60*60*1000;
 
     /**
      *  生成客户端TOKEN

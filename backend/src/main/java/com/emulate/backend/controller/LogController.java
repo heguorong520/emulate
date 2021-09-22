@@ -5,6 +5,7 @@ import com.emulate.backend.dto.QueryLogDTO;
 import com.emulate.backend.entity.BackendLogEntity;
 import com.emulate.backend.service.BackendLogService;
 
+import com.emulate.core.controller.BaseController;
 import com.emulate.core.result.ResultBody;
 import com.emulate.core.util.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Mark sunlightcs@gmail.com
  */
 @Controller
-@RequestMapping
-public class LogController {
+public class LogController  extends BaseController {
 	@Autowired
 	private BackendLogService sysLogService;
 

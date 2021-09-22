@@ -11,6 +11,7 @@ package com.emulate.backend.controller;
 import com.emulate.backend.emums.MenuTypeEnum;
 import com.emulate.backend.entity.BackendMenuEntity;
 import com.emulate.backend.service.BackendMenuService;
+import com.emulate.core.controller.BaseController;
 import com.emulate.core.enums.BaseErrorEnum;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.filter.AuthFilter;
@@ -28,8 +29,7 @@ import java.util.Objects;
  * 系统菜单
  */
 @RestController
-@RequestMapping
-public class MenuController {
+public class MenuController extends BaseController {
     @Autowired
     private BackendMenuService backendMenuService;
 

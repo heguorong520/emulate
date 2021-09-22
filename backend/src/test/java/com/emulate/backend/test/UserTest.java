@@ -28,9 +28,9 @@ public class UserTest {
     @Test
     public void addUser() throws Exception {
         BackendUserDTO userDTO = new BackendUserDTO();
-        userDTO.setPassword("123456");
+        userDTO.setPassword("admin");
         userDTO.setMobile("1388888888");
-        userDTO.setUsername("9996");
+        userDTO.setUsername("admin");
         userService.saveUser(userDTO);
     }
 

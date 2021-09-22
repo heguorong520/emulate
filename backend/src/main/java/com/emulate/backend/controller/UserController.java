@@ -9,6 +9,7 @@ import com.emulate.backend.dto.QueryUserDTO;
 import com.emulate.backend.entity.BackendUserEntity;
 import com.emulate.backend.service.BackendUserRoleService;
 import com.emulate.backend.service.BackendUserService;
+import com.emulate.core.controller.BaseController;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.result.ResultBody;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping
-public class UserController {
+public class UserController extends BaseController {
     @Autowired
     private BackendUserService backendUserService;
     @Autowired

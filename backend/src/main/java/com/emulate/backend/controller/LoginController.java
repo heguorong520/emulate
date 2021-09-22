@@ -3,6 +3,7 @@ package com.emulate.backend.controller;
 import com.emulate.backend.dto.BackendLoginDTO;
 import com.emulate.backend.dto.BackendLoginResultDTO;
 import com.emulate.backend.service.BackendUserService;
+import com.emulate.core.controller.BaseController;
 import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.result.ResultBody;
 import io.swagger.annotations.Api;
@@ -16,13 +17,13 @@ import java.io.IOException;
 
 @RestController
 @Api(tags = "登录模块")
-public class LoginController {
+public class LoginController extends BaseController {
     @Resource
     private BackendUserService backendUserService;
 
 
     @ApiOperation("登录")
-    @PostMapping("/login")
+    @PostMapping("a/login")
     public ResultBody<BackendLoginResultDTO> login(@RequestBody BackendLoginDTO loginDTO) throws Exception {
         return ResultBody.ok(backendUserService.login(loginDTO));
     }

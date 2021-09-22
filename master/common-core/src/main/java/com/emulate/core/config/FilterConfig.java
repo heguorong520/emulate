@@ -26,9 +26,9 @@ public class FilterConfig {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new AuthFilter(redisTemplate,authSignYml));
-        registration.addUrlPatterns("/*");
+        registration.addUrlPatterns("/api/*");
         registration.setName("ClientAuthFilter");
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        registration.setOrder(Ordered.LOWEST_PRECEDENCE);
         return registration;
     }
 
@@ -37,9 +37,9 @@ public class FilterConfig {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new SignFilter(redisTemplate,authSignYml));
-        registration.addUrlPatterns("/*");
+        registration.addUrlPatterns("/api/*");
         registration.setName("SignFilter");
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE-1);
+        registration.setOrder(Ordered.LOWEST_PRECEDENCE-1);
         return registration;
     }
 

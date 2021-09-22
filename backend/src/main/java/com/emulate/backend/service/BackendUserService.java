@@ -119,6 +119,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         }
         String tokenCacheKey = RedisCacheKeyEnum.后台TOKEN.getCacheKey() + backendUserEntity.getUserId();
         String token = (String) redisTemplate.opsForValue().get(tokenCacheKey);
+
         if (token == null) {
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("username", backendUserEntity.getUsername());
