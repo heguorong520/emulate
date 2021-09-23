@@ -16,7 +16,7 @@ import com.emulate.backend.dto.BackendLoginResultDTO;
 import com.emulate.backend.dto.BackendUserDTO;
 import com.emulate.backend.dto.QueryUserDTO;
 import com.emulate.backend.entity.BackendUserEntity;
-import com.emulate.core.enums.BaseErrorEnum;
+import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.RedisCacheKeyEnum;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.filter.AuthFilter;
@@ -24,9 +24,7 @@ import com.emulate.core.jwt.TokenUtil;
 import com.emulate.core.user.LoginUserDTO;
 import com.emulate.core.util.AESUtil;
 import com.emulate.core.util.PageData;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +93,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         BackendUserEntity backendUserEntity = this.baseMapper.selectById(userId);
         if (!backendUserEntity.getPassword().equals(aesPwd)) {
             //旧密码校验通过
-            throw new CustomizeException(BaseErrorEnum.旧密码错误);
+            throw new CustomizeException(GlobalErrorEnum.旧密码错误);
         }
         return this.update(userEntity,
                 new QueryWrapper<BackendUserEntity>().eq("user_id", userId).eq("password", aesPwd));
@@ -111,13 +109,13 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         userEntityQueryWrapper.eq("username", backendLoginDTO.getUsername());
         BackendUserEntity backendUserEntity = this.baseMapper.selectOne(userEntityQueryWrapper);
         if (backendUserEntity == null) {
-            throw new CustomizeException(BaseErrorEnum.用户不存在);
+            throw new CustomizeException(GlobalErrorEnum.用户不存在);
         }
 
         if (!backendUserEntity.getPassword().equals(AESUtil.encrypt(backendLoginDTO.getPassword(), AESUtil.PASSWORD_KEY))) {
-            throw new CustomizeException(BaseErrorEnum.密码错误);
+            throw new CustomizeException(GlobalErrorEnum.密码错误);
         }
-        String tokenCacheKey = RedisCacheKeyEnum.后台TOKEN.getCacheKey() + backendUserEntity.getUserId();
+        String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + backendUserEntity.getUserId();
         String token = (String) redisTemplate.opsForValue().get(tokenCacheKey);
 
         if (token == null) {
@@ -126,7 +124,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
             userInfo.put("userId", backendUserEntity.getUserId());
             token = TokenUtil.createTokenBackend(JSONObject.toJSONString(userInfo));
             //保存TOKEN在缓存中做登录权限进行对比
-            redisTemplate.opsForValue().set(tokenCacheKey, token, RedisCacheKeyEnum.后台TOKEN.getCacheTime(), TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(tokenCacheKey, token, RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheTime(), TimeUnit.SECONDS);
         }
 
         BackendLoginResultDTO resultDTO = new BackendLoginResultDTO();
@@ -142,10 +140,10 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
     public void logout() {
         LoginUserDTO userDTO = AuthFilter.backendLoginUserDTO();
         if(userDTO == null) {
-            throw new CustomizeException(BaseErrorEnum.未登录);
+            throw new CustomizeException(GlobalErrorEnum.未登录);
         }
         //清理缓存中的TOKEN即可
-        String tokenCacheKey = RedisCacheKeyEnum.后台TOKEN.getCacheKey() + userDTO.getUserId();
+        String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + userDTO.getUserId();
         redisTemplate.delete(tokenCacheKey);
     }
 }

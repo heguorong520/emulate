@@ -1,10 +1,9 @@
 package com.emulate.core.filter;
 
 import com.alibaba.fastjson.JSONObject;
-import com.emulate.core.enums.BaseErrorEnum;
+import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.result.ResultBody;
-import org.apache.commons.io.IOUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -13,7 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -27,7 +25,7 @@ public class BaseFilter extends OncePerRequestFilter {
         chain.doFilter(request,response);
     }
 
-    protected void writeError(HttpServletResponse response, BaseErrorEnum errorEnum) throws IOException {
+    protected void writeError(HttpServletResponse response, GlobalErrorEnum errorEnum) throws IOException {
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html;charset=utf-8");
         response.getWriter().write( JSONObject.toJSONString(ResultBody.error(errorEnum)));

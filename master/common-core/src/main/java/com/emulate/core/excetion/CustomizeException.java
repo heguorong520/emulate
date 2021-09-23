@@ -1,6 +1,6 @@
 package com.emulate.core.excetion;
 
-import com.emulate.core.enums.BaseErrorEnum;
+import com.emulate.core.enums.GlobalErrorEnum;
 
 
 /**
@@ -20,13 +20,13 @@ public class CustomizeException extends RuntimeException{
         super(msg, e);
         this.msg = msg;
     }
-    public CustomizeException(BaseErrorEnum errorEnum) {
+    public CustomizeException(GlobalErrorEnum errorEnum) {
         super(errorEnum.getMsg());
         this.msg = errorEnum.getMsg();
         this.code = errorEnum.getCode();
     }
 
-    public CustomizeException(BaseErrorEnum errorEnum, Throwable e) {
+    public CustomizeException(GlobalErrorEnum errorEnum, Throwable e) {
         super(errorEnum.getMsg(),e);
         this.msg = errorEnum.getMsg();
         this.code = errorEnum.getCode();

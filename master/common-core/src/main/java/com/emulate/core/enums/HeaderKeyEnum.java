@@ -1,5 +1,10 @@
 package com.emulate.core.enums;
 
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+
 public enum HeaderKeyEnum {
 
     DEVICEID("deviceId","deviceId不能为空"),
@@ -23,5 +28,21 @@ public enum HeaderKeyEnum {
 
     public String getMsg() {
         return error;
+    }
+
+    private static HttpServletRequest getCurrentRequest() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs == null) {
+            return null;
+        }
+        return attrs.getRequest();
+    }
+    //获取请求头对应的值
+    public  String value() {
+        HttpServletRequest request = getCurrentRequest();
+        if(getCurrentRequest() == null){
+            return null;
+        }
+        return request.getHeader(this.getName());
     }
 }

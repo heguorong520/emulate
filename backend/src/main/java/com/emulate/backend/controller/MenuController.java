@@ -12,7 +12,7 @@ import com.emulate.backend.emums.MenuTypeEnum;
 import com.emulate.backend.entity.BackendMenuEntity;
 import com.emulate.backend.service.BackendMenuService;
 import com.emulate.core.controller.BaseController;
-import com.emulate.core.enums.BaseErrorEnum;
+import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.result.ResultBody;
@@ -116,13 +116,13 @@ public class MenuController extends BaseController {
     @GetMapping("menu/delete")
     public ResultBody<?> delete(long menuId) {
         if (menuId <= 31) {
-            return ResultBody.error(BaseErrorEnum.不能删除);
+            return ResultBody.error(GlobalErrorEnum.不能删除);
         }
 
         //判断是否有子菜单或按钮
         List<BackendMenuEntity> menuList = backendMenuService.queryListParentId(menuId);
         if (menuList.size() > 0) {
-            return ResultBody.error(BaseErrorEnum.存在子节点);
+            return ResultBody.error(GlobalErrorEnum.存在子节点);
         }
 
         backendMenuService.delete(menuId);

@@ -2,28 +2,21 @@ package com.emulate.core.filter;
 
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.emulate.core.enums.BaseErrorEnum;
+import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.HeaderKeyEnum;
-import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.util.AESUtil;
 import com.emulate.core.yml.AuthSignYml;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -70,7 +63,7 @@ public class SignFilter extends BaseFilter {
         String redisRandom = (String) redisTemplate.opsForValue().get(random);
         if (null != redisRandom) {
             log.info("RANDOM:{},在5分中内使用过", random);
-            this.writeError(response, BaseErrorEnum.签名异常);
+            this.writeError(response, GlobalErrorEnum.签名异常);
         }
 
         redisTemplate.opsForValue().set(random, random, 5, TimeUnit.MINUTES);
@@ -78,7 +71,7 @@ public class SignFilter extends BaseFilter {
         Long time = Long.valueOf(timeStr) + 60L * 1000L;
         if (System.currentTimeMillis() >= time) {
             log.info("time:{},请求发起时间超过一分钟");
-            this.writeError(response, BaseErrorEnum.签名异常);
+            this.writeError(response, GlobalErrorEnum.签名异常);
         }
         redisTemplate.opsForValue().set(random, random);
         //签名校验
@@ -97,7 +90,7 @@ public class SignFilter extends BaseFilter {
         if (!headerSign.equals(signStr)) {
             log.info("headerSign:{}", headerSign);
             log.info("signStr:{}", signStr);
-            this.writeError(response, BaseErrorEnum.签名异常);
+            this.writeError(response, GlobalErrorEnum.签名异常);
         }
     }
 
@@ -113,7 +106,8 @@ public class SignFilter extends BaseFilter {
         for (HeaderKeyEnum headerKeyEnum : HeaderKeyEnum.values()) {
             String value = request.getHeader(headerKeyEnum.getName());
             if (ObjectUtil.isEmpty(value)) {
-                this.writeError(response, BaseErrorEnum.签名异常);
+                log.info("请求头异常原因：{}",headerKeyEnum.getMsg());
+                this.writeError(response, GlobalErrorEnum.签名异常);
             }
             paramMap.put(headerKeyEnum.getName(), value);
         }

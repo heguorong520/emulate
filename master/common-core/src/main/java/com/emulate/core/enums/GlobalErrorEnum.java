@@ -1,6 +1,6 @@
 package com.emulate.core.enums;
 
-public enum BaseErrorEnum {
+public enum GlobalErrorEnum {
     默认异常(500,"服务器异常！"),
     数据已存在(5001,"数据已存在！"),
     旧密码错误(5002,"旧密码错误！"),
@@ -13,7 +13,7 @@ public enum BaseErrorEnum {
     签名异常(10001,"应用签名失败");
 
 
-    BaseErrorEnum(int code, String msg){
+    GlobalErrorEnum(int code, String msg){
         this.code = code;
         this.msg = msg;
     }

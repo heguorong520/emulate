@@ -8,12 +8,13 @@
 
 package com.emulate.core.handler;
 
-import com.emulate.core.enums.BaseErrorEnum;
+import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.result.ResultBody;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -40,7 +41,7 @@ public class CustomizeExceptionHandler {
     @ExceptionHandler(DuplicateKeyException.class)
     public ResultBody handleDuplicateKeyException(DuplicateKeyException e) {
         log.error(e.getMessage(), e);
-        return ResultBody.error(BaseErrorEnum.数据已存在);
+        return ResultBody.error(GlobalErrorEnum.数据已存在);
     }
 
 
@@ -50,4 +51,9 @@ public class CustomizeExceptionHandler {
         return ResultBody.error();
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResultBody handleException(MethodArgumentNotValidException e) {
+        log.error(e.getBindingResult().getAllErrors().get(0).getDefaultMessage(), e);
+        return ResultBody.error(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+    }
 }
