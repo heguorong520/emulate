@@ -52,7 +52,7 @@ public class LoginController extends BaseController {
 
     @ApiOperation("登出接口")
     @PostMapping("/logout")
-    public ResultBody<?> logout(@RequestBody BackendLoginDTO loginDTO){
+    public ResultBody<?> logout(){
         backendUserService.logout();
         return ResultBody.ok();
     }

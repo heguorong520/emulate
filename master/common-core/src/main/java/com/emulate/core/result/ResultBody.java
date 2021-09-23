@@ -42,6 +42,7 @@ public  class  ResultBody<T> {
     }
     public static ResultBody error(String msg){
         ResultBody resultBody = new ResultBody();
+        resultBody.setCode(500);
         resultBody.setMsg(msg);
         return resultBody;
     }

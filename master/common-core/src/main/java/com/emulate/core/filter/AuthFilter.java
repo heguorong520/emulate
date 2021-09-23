@@ -3,6 +3,7 @@ package com.emulate.core.filter;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.HeaderKeyEnum;
 import com.emulate.core.jwt.TokenUtil;
@@ -50,9 +51,13 @@ public class AuthFilter extends BaseFilter {
                     this.writeError(response, GlobalErrorEnum.TOKEN异常);
                 }
                 if ("backend".equals(clientType)) {
-                    backendUser.set(BeanUtil.toBean(userJson, LoginUserDTO.class));
+                    JSONObject jsonObject =  JSONObject.parseObject(userJson);
+                    LoginUserDTO userDTO = BeanUtil.toBean(jsonObject, LoginUserDTO.class);
+                    backendUser.set(userDTO);
                 } else {
-                    clientUser.set(BeanUtil.toBean(userJson, LoginUserDTO.class));
+                    JSONObject jsonObject =  JSONObject.parseObject(userJson);
+                    LoginUserDTO userDTO = BeanUtil.toBean(jsonObject, LoginUserDTO.class);
+                    clientUser.set(userDTO);
                 }
                 chain.doFilter(request, response);
                 return;

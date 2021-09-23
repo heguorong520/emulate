@@ -26,7 +26,6 @@ import java.util.List;
  * 系统用户
  */
 @RestController
-@RequestMapping
 public class UserController extends BaseController {
     @Autowired
     private BackendUserService backendUserService;

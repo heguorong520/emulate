@@ -8,6 +8,7 @@
 
 package com.emulate.backend.controller;
 
+import com.emulate.backend.dto.NavDTO;
 import com.emulate.backend.emums.MenuTypeEnum;
 import com.emulate.backend.entity.BackendMenuEntity;
 import com.emulate.backend.service.BackendMenuService;
@@ -37,8 +38,9 @@ public class MenuController extends BaseController {
      * 导航菜单
      */
     @GetMapping("menu/nav")
-    public ResultBody<BackendMenuEntity> nav() {
-        List<BackendMenuEntity> menuList = backendMenuService.getUserMenuList(AuthFilter.backendLoginUserDTO().getUserId());
+    public ResultBody<NavDTO> nav() {
+        Long userId = AuthFilter.backendLoginUserDTO().getUserId();
+        List<NavDTO> menuList = backendMenuService.getUserMenuList(userId);
         return ResultBody.ok(menuList);
     }
 
