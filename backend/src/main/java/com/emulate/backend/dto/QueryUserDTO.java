@@ -5,5 +5,7 @@ import lombok.Data;
 
 @Data
 public class QueryUserDTO extends BaseQueryDTO {
-    private String userName;
+    private String username;
+    private String nickname;
+    private String mobile;
 }

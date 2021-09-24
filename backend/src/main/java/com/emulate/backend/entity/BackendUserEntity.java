@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -37,12 +39,13 @@ public class BackendUserEntity implements Serializable {
 	/**
 	 * 密码
 	 */
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@JsonIgnore
 	private String password;
 
 	/**
 	 * 盐
 	 */
+	@JsonIgnore
 	private String salt;
 
 
@@ -68,5 +71,21 @@ public class BackendUserEntity implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
 	private Date createTime;
 
+	/**
+	 * 角色ID列表
+	 */
+	@TableField(exist=false)
+	private List<String> roleNameList;
 
+	public List<String> getRoleNameList(){
+		if(roleNameList == null) {
+			roleNameList = new ArrayList<>();
+		}
+		return roleNameList;
+	}
+
+	/**
+	 * 用户名
+	 */
+	private String nickname;
 }

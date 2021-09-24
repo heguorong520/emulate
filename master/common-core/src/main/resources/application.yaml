@@ -3,14 +3,14 @@ spring:
     allow-bean-definition-overriding: true
 #数据库配置
   shardingsphere:
+    props:
+      sql-show: true
+      sql-simple: true
     masterslave:
       slave-data-source-names: slave1
       master-data-source-name: master
       name: ms
       load-balance-algorithm-type: ROUND_ROBIN
-      props:
-        sql:
-          show: true
     datasource:
       names: master,slave1
       master:

@@ -38,7 +38,7 @@ public class UserTest {
     public void queryPage(){
         QueryUserDTO queryUserBodyDTO = new QueryUserDTO();
         queryUserBodyDTO.setPage(1);
-        queryUserBodyDTO.setPageSize(10);
+        queryUserBodyDTO.setLimit(10);
         PageData<BackendUserEntity> result = userService.queryPage(queryUserBodyDTO);
         log.info("查询结果{}", JSONObject.toJSONString(result));
         TestCase.assertNotNull(result);

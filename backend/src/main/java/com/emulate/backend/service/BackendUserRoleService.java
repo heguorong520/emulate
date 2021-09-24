@@ -1,4 +1,4 @@
- 
+
 
 package com.emulate.backend.service;
 
@@ -9,7 +9,11 @@ import com.emulate.backend.entity.BackendUserRoleEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -21,32 +25,54 @@ import java.util.List;
 public class BackendUserRoleService extends ServiceImpl<BackendUserRoleDao, BackendUserRoleEntity> {
 
 
-	@Transactional
-	public void saveOrUpdate(Long userId, List<Long> roleIdList) {
-		//先删除用户与角色关系
-		this.remove(new QueryWrapper<BackendUserRoleEntity>().eq("user_id", userId));
+    @Transactional
+    public void saveOrUpdate(Long userId, List<Long> roleIdList) {
+        //先删除用户与角色关系
+        this.remove(new QueryWrapper<BackendUserRoleEntity>().eq("user_id", userId));
 
-		if(roleIdList == null || roleIdList.size() == 0){
-			return ;
-		}
-		
-		//保存用户与角色关系
-		for(Long roleId : roleIdList){
-			BackendUserRoleEntity sysUserRoleEntity = new BackendUserRoleEntity();
-			sysUserRoleEntity.setUserId(userId);
-			sysUserRoleEntity.setRoleId(roleId);
+        if (roleIdList == null || roleIdList.size() == 0) {
+            return;
+        }
 
-			this.save(sysUserRoleEntity);
-		}
+        //保存用户与角色关系
+        for (Long roleId : roleIdList) {
+            BackendUserRoleEntity sysUserRoleEntity = new BackendUserRoleEntity();
+            sysUserRoleEntity.setUserId(userId);
+            sysUserRoleEntity.setRoleId(roleId);
 
-	}
+            this.save(sysUserRoleEntity);
+        }
 
-	public List<Long> queryRoleIdList(Long userId) {
-		return baseMapper.queryRoleIdList(userId);
-	}
+    }
 
-	@Transactional
-	public int deleteBatch(Long[] roleIds){
-		return baseMapper.deleteBatch(roleIds);
-	}
+    public List<Long> queryRoleIdList(Long userId) {
+        return baseMapper.queryRoleIdList(userId);
+    }
+
+    @Transactional
+    public int deleteBatch(Long[] roleIds) {
+        return baseMapper.deleteBatch(roleIds);
+    }
+
+    public Map<Long, List<Long>> queryRoleIdList(Long... userId) {
+        if (userId == null || userId.length == 0) {
+            return new HashMap<>();
+        }
+        QueryWrapper<BackendUserRoleEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("user_id", userId);
+        List<BackendUserRoleEntity> list = baseMapper.
+                selectList(queryWrapper);
+        Map<Long, List<Long>> result = list.
+                stream().
+                collect(
+                        Collectors.toMap(BackendUserRoleEntity::getUserId,
+                                e -> list.stream().
+										filter(a -> e.getUserId().equals(a.getUserId())).
+										map(BackendUserRoleEntity::getRoleId).
+										collect(Collectors.toList())
+                        ));
+        return result;
+    }
+
+
 }

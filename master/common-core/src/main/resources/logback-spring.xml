@@ -110,10 +110,9 @@
     </appender>
 
     <logger name="org.springframework" level="INFO" />
-    <logger name="org.hibernate" level="INFO" />
-    <logger name="com.kingboy.repository" level="DEBUG" />
+    <logger name="org.apache.shardingsphere" level="INFO" />
 
-    <root level="INFO">
+    <root level="debug">
         <appender-ref ref="FILEERROR" />
         <appender-ref ref="FILEWARN" />
         <appender-ref ref="FILEINFO" />

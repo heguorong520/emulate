@@ -26,10 +26,11 @@ public class BackendUserDTO implements Serializable {
     @NotBlank(message = "登录名密码为空")
     @ApiModelProperty("登录密码")
     private String password;
-
     @ApiModelProperty("角色列表")
     private List<Long> roleIdList;
-
     @ApiModelProperty("用户ID")
     private Long userId;
+    @NotBlank(message = "昵称不能为空")
+    @ApiModelProperty("昵称")
+    private String nickname;
 }

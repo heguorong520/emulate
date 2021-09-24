@@ -21,7 +21,7 @@ public class BackendLogService extends ServiceImpl<BackendLogDao, BackendLogEnti
 
     public PageData<BackendLogEntity> queryPage(QueryLogDTO queryLogDTO) {
         IPage<BackendLogEntity> page = this.page(
-            new Page<>(queryLogDTO.getPage(),queryLogDTO.getPageSize()),
+            new Page<>(queryLogDTO.getPage(),queryLogDTO.getLimit()),
             new QueryWrapper<BackendLogEntity>()
         );
         return new PageData<>(page);

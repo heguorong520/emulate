@@ -31,10 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -47,17 +49,48 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
     @Resource
     private BackendUserRoleService backendUserRoleService;
 
+    @Resource
+    private BackendRoleService backendRoleService;
+
     public List<Long> queryAllMenuId(Long userId) {
         return baseMapper.queryAllMenuId(userId);
     }
 
     public PageData<BackendUserEntity> queryPage(QueryUserDTO userBodyDTO) {
         IPage<BackendUserEntity> page = this.page(
-                new Page<>(userBodyDTO.getPage(), userBodyDTO.getPageSize()),
-                new QueryWrapper<BackendUserEntity>()
-                        .like(StringUtils.isNotBlank(userBodyDTO.getUserName()), "username", userBodyDTO.getUserName())
+                new Page<>(userBodyDTO.getPage(), userBodyDTO.getLimit()),
+                new QueryWrapper<BackendUserEntity>().
+                        eq(StringUtils.isNotBlank(userBodyDTO.getUsername()), "username", userBodyDTO.getUsername()).
+                        eq(StringUtils.isNotBlank(userBodyDTO.getNickname()),"nickname",userBodyDTO.getNickname())
         );
-        return new PageData(page);
+        //角色列表
+        if (page.getRecords().size() > 0) {
+            List<Long> userIds = page.getRecords().
+                    stream().
+                    map(BackendUserEntity::getUserId).
+                    collect(Collectors.toList());
+            //获取用户对应角色ID
+            Map<Long, List<Long>> userRoleIdMaps = backendUserRoleService.queryRoleIdList(userIds.toArray(new Long[userIds.size() - 1]));
+            List<Long> roleIds = new ArrayList<>();
+            userRoleIdMaps.forEach((k, v) -> {
+                roleIds.addAll(v);
+            });
+            //角色名称填充处理
+            Map<Long, String> roleNameMap = backendRoleService.findRoleNameMap(roleIds);
+            for (BackendUserEntity u : page.getRecords()) {
+                if (!userRoleIdMaps.containsKey(u.getUserId())) {
+                    continue;
+                }
+                List<Long> userRoleIds = userRoleIdMaps.get(u.getUserId());
+                for (Long roleId : userRoleIds) {
+                    if (!roleNameMap.containsKey(roleId)) {
+                        continue;
+                    }
+                    u.getRoleNameList().add(roleNameMap.get(roleId));
+                }
+            }
+        }
+        return new PageData<>(page);
     }
 
 
@@ -88,7 +121,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
     @Transactional
     public boolean updatePassword(Long userId, String password, String newPassword) throws Exception {
         BackendUserEntity userEntity = new BackendUserEntity();
-        userEntity.setPassword(AESUtil.encrypt(newPassword,AESUtil.PASSWORD_KEY));
+        userEntity.setPassword(AESUtil.encrypt(newPassword, AESUtil.PASSWORD_KEY));
         String aesPwd = AESUtil.encrypt(password, AESUtil.PASSWORD_KEY);
         BackendUserEntity backendUserEntity = this.baseMapper.selectById(userId);
         if (!backendUserEntity.getPassword().equals(aesPwd)) {
@@ -101,6 +134,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
 
     /**
      * 登录
+     *
      * @param backendLoginDTO
      * @throws Exception
      */
@@ -139,7 +173,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
      */
     public void logout() {
         LoginUserDTO userDTO = AuthFilter.backendLoginUserDTO();
-        if(userDTO == null) {
+        if (userDTO == null) {
             throw new CustomizeException(GlobalErrorEnum.未登录);
         }
         //清理缓存中的TOKEN即可
