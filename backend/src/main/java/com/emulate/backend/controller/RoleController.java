@@ -35,7 +35,7 @@ public class RoleController extends BaseController {
      */
     @GetMapping("role/list")
     public ResultBody<?> list(@RequestParam Map<String, Object> params) {
-        PageData page = backendRoleService.queryPage(params);
+        PageData page = backendRoleService.findPage(params);
 
         return ResultBody.ok(page);
     }
@@ -58,7 +58,7 @@ public class RoleController extends BaseController {
         BackendRoleEntity role = backendRoleService.getById(roleId);
 
         //查询角色对应的菜单
-        List<Long> menuIdList = backendRoleMenuService.queryMenuIdList(roleId);
+        List<Long> menuIdList = backendRoleMenuService.findMenuIdList(roleId);
         role.setMenuIdList(menuIdList);
 
 

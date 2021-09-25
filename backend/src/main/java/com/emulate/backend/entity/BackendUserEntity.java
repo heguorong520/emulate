@@ -83,6 +83,12 @@ public class BackendUserEntity implements Serializable {
 		}
 		return roleNameList;
 	}
+	public List<Long> getRoleIdList(){
+		if(roleIdList == null) {
+			roleIdList = new ArrayList<>();
+		}
+		return roleIdList;
+	}
 
 	/**
 	 * 用户名

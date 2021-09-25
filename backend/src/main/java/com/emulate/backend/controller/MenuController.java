@@ -8,7 +8,8 @@
 
 package com.emulate.backend.controller;
 
-import com.emulate.backend.dto.NavDTO;
+import cn.hutool.core.util.ObjectUtil;
+import com.emulate.backend.dto.BackendMenuNavDTO;
 import com.emulate.backend.emums.MenuTypeEnum;
 import com.emulate.backend.entity.BackendMenuEntity;
 import com.emulate.backend.service.BackendMenuService;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 系统菜单
@@ -38,9 +40,9 @@ public class MenuController extends BaseController {
      * 导航菜单
      */
     @GetMapping("menu/nav")
-    public ResultBody<NavDTO> nav() {
+    public ResultBody<BackendMenuNavDTO> nav() {
         Long userId = AuthFilter.backendLoginUserDTO().getUserId();
-        List<NavDTO> menuList = backendMenuService.getUserMenuList(userId);
+        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(userId);
         return ResultBody.ok(menuList);
     }
 
@@ -50,13 +52,6 @@ public class MenuController extends BaseController {
     @GetMapping("menu/list")
     public ResultBody<List<BackendMenuEntity>> list() {
         List<BackendMenuEntity> menuList = backendMenuService.list();
-        for (BackendMenuEntity sysMenuEntity : menuList) {
-            BackendMenuEntity parentMenuEntity = backendMenuService.getById(sysMenuEntity.getParentId());
-            if (parentMenuEntity != null) {
-                sysMenuEntity.setParentName(parentMenuEntity.getName());
-            }
-        }
-
         return ResultBody.ok(menuList);
     }
 
@@ -66,7 +61,7 @@ public class MenuController extends BaseController {
     @GetMapping("menu/select")
     public ResultBody<List<BackendMenuEntity>> select() {
         //查询列表数据
-        List<BackendMenuEntity> menuList = backendMenuService.queryNotButtonList();
+        List<BackendMenuEntity> menuList = backendMenuService.findNotButtonList();
 
         //添加顶级菜单
         BackendMenuEntity root = new BackendMenuEntity();
@@ -122,7 +117,7 @@ public class MenuController extends BaseController {
         }
 
         //判断是否有子菜单或按钮
-        List<BackendMenuEntity> menuList = backendMenuService.queryListParentId(menuId);
+        List<BackendMenuEntity> menuList = backendMenuService.findListParentId(menuId);
         if (menuList.size() > 0) {
             return ResultBody.error(GlobalErrorEnum.存在子节点);
         }

@@ -30,7 +30,7 @@ public class BackendRoleService extends ServiceImpl<BackendRoleDao, BackendRoleE
     private BackendUserRoleService backendUserRoleService;
 
 
-    public PageData queryPage(Map<String, Object> params) {
+    public PageData findPage(Map<String, Object> params) {
         String roleName = (String) params.get("roleName");
 
         IPage<BackendRoleEntity> page = this.page(

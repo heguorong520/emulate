@@ -37,7 +37,7 @@ public class UserController extends BaseController {
      */
     @GetMapping("user/list")
     public ResultBody<?> list(@ModelAttribute QueryUserDTO queryUserDTO) {
-        PageData page = backendUserService.queryPage(queryUserDTO);
+        PageData page = backendUserService.findPage(queryUserDTO);
 
         return ResultBody.ok(page);
     }
@@ -65,7 +65,7 @@ public class UserController extends BaseController {
         BackendUserEntity user = backendUserService.getById(userId);
 
         //获取用户所属的角色列表
-        List<Long> roleIdList = backendUserRoleService.queryRoleIdList(userId);
+        List<Long> roleIdList = backendUserRoleService.findRoleIdList(userId);
         user.setRoleIdList(roleIdList);
 
         return ResultBody.ok(user);
@@ -75,23 +75,14 @@ public class UserController extends BaseController {
      * 保存用户
      */
     @PostMapping("user/save")
-    public ResultBody<?> save(@RequestBody BackendUserDTO user) throws Exception {
+    public ResultBody<?> save(@Valid @RequestBody BackendUserDTO user) throws Exception {
 
         backendUserService.saveUser(user);
 
         return ResultBody.ok();
     }
 
-    /**
-     * 修改用户
-     */
-    @PostMapping("user/update")
-    public ResultBody<?> update(@RequestBody BackendUserDTO user) throws Exception {
 
-        backendUserService.update(user);
-
-        return ResultBody.ok();
-    }
 
     /**
      * 删除用户
@@ -99,15 +90,13 @@ public class UserController extends BaseController {
     @PostMapping("user/delete")
     public ResultBody<?> delete(@RequestBody Long[] userIds) {
         if (ArrayUtils.contains(userIds, 1L)) {
-            throw new CustomizeException("系统管理员不能删除");
+            throw new CustomizeException("系统内置管理员不能删除");
         }
 
         if (ArrayUtils.contains(userIds, AuthFilter.backendLoginUserDTO().getUserId())) {
             throw new CustomizeException("当前用户不能删除");
         }
-
-        backendUserService.removeByIds(Arrays.asList(userIds));
-
+        backendUserService.deleteByUserId(userIds);
         return ResultBody.ok();
     }
 }

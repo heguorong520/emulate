@@ -31,10 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -56,12 +53,13 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         return baseMapper.queryAllMenuId(userId);
     }
 
-    public PageData<BackendUserEntity> queryPage(QueryUserDTO userBodyDTO) {
+    public PageData<BackendUserEntity> findPage(QueryUserDTO userBodyDTO) {
         IPage<BackendUserEntity> page = this.page(
                 new Page<>(userBodyDTO.getPage(), userBodyDTO.getLimit()),
                 new QueryWrapper<BackendUserEntity>().
                         eq(StringUtils.isNotBlank(userBodyDTO.getUsername()), "username", userBodyDTO.getUsername()).
-                        eq(StringUtils.isNotBlank(userBodyDTO.getNickname()),"nickname",userBodyDTO.getNickname())
+                        eq(StringUtils.isNotBlank(userBodyDTO.getNickname()),"nickname",userBodyDTO.getNickname()).
+                        orderByDesc("create_time")
         );
         //角色列表
         if (page.getRecords().size() > 0) {
@@ -70,7 +68,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
                     map(BackendUserEntity::getUserId).
                     collect(Collectors.toList());
             //获取用户对应角色ID
-            Map<Long, List<Long>> userRoleIdMaps = backendUserRoleService.queryRoleIdList(userIds.toArray(new Long[userIds.size() - 1]));
+            Map<Long, List<Long>> userRoleIdMaps = backendUserRoleService.findRoleIdList(userIds.toArray(new Long[userIds.size() - 1]));
             List<Long> roleIds = new ArrayList<>();
             userRoleIdMaps.forEach((k, v) -> {
                 roleIds.addAll(v);
@@ -87,6 +85,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
                         continue;
                     }
                     u.getRoleNameList().add(roleNameMap.get(roleId));
+                    u.getRoleIdList().add(roleId);
                 }
             }
         }
@@ -95,27 +94,17 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveUser(@Valid BackendUserDTO userDTO) {
+    public void saveUser( BackendUserDTO userDTO) {
         BackendUserEntity user = Convert.convert(BackendUserEntity.class, userDTO);
-        user.setPassword(AESUtil.encrypt(user.getPassword(), AESUtil.PASSWORD_KEY));
-        this.save(user);
-        //保存用户与角色关系
-        backendUserRoleService.saveOrUpdate(user.getUserId(), user.getRoleIdList());
-    }
-
-
-    @Transactional(rollbackFor = Exception.class)
-    public void update(BackendUserDTO user) throws Exception {
-        if (ObjectUtil.isEmpty(user.getPassword())) {
-            user.setPassword(null);
-        } else {
-            user.setPassword(AESUtil.encrypt(user.getPassword(), AESUtil.PASSWORD_KEY));
+        if(user.getUserId() == null) {
+            user.setPassword(AESUtil.encrypt("123456", AESUtil.PASSWORD_KEY));
         }
-        BackendUserEntity backendUserEntity = Convert.convert(BackendUserEntity.class, user);
-        this.updateById(backendUserEntity);
+        this.saveOrUpdate(user);
         //保存用户与角色关系
         backendUserRoleService.saveOrUpdate(user.getUserId(), user.getRoleIdList());
     }
+
+
 
 
     @Transactional
@@ -179,5 +168,11 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         //清理缓存中的TOKEN即可
         String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + userDTO.getUserId();
         redisTemplate.delete(tokenCacheKey);
+    }
+
+    @Transactional
+    public void deleteByUserId(Long ...id){
+        baseMapper.deleteBatchIds(Arrays.stream(id).collect(Collectors.toList()));
+        backendUserRoleService.deleteRoleByUserId(id);
     }
 }

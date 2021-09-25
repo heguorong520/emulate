@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
@@ -29,7 +28,7 @@ public class LogController  extends BaseController {
 	@ResponseBody
 	@GetMapping("/log/list")
 	public ResultBody<BackendLogEntity> list(@ModelAttribute QueryLogDTO queryLogDTO){
-		PageData<BackendLogEntity> page = sysLogService.queryPage(queryLogDTO);
+		PageData<BackendLogEntity> page = sysLogService.findPage(queryLogDTO);
 		return ResultBody.ok(page);
 	}
 

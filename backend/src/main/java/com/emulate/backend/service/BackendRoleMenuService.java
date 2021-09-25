@@ -38,7 +38,7 @@ public class BackendRoleMenuService extends ServiceImpl<BackendRoleMenuDao, Back
 		}
 	}
 
-	public List<Long> queryMenuIdList(Long roleId) {
+	public List<Long> findMenuIdList(Long roleId) {
 		return baseMapper.queryMenuIdList(roleId);
 	}
 

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class BackendLogService extends ServiceImpl<BackendLogDao, BackendLogEntity> {
 
-    public PageData<BackendLogEntity> queryPage(QueryLogDTO queryLogDTO) {
+    public PageData<BackendLogEntity> findPage(QueryLogDTO queryLogDTO) {
         IPage<BackendLogEntity> page = this.page(
             new Page<>(queryLogDTO.getPage(),queryLogDTO.getLimit()),
             new QueryWrapper<BackendLogEntity>()

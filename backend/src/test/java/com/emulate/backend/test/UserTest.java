@@ -28,7 +28,7 @@ public class UserTest {
     @Test
     public void addUser() throws Exception {
         BackendUserDTO userDTO = new BackendUserDTO();
-        userDTO.setPassword("admin");
+        //userDTO.setPassword("admin");
         userDTO.setMobile("1388888888");
         userDTO.setUsername("admin");
         userService.saveUser(userDTO);
@@ -39,7 +39,7 @@ public class UserTest {
         QueryUserDTO queryUserBodyDTO = new QueryUserDTO();
         queryUserBodyDTO.setPage(1);
         queryUserBodyDTO.setLimit(10);
-        PageData<BackendUserEntity> result = userService.queryPage(queryUserBodyDTO);
+        PageData<BackendUserEntity> result = userService.findPage(queryUserBodyDTO);
         log.info("查询结果{}", JSONObject.toJSONString(result));
         TestCase.assertNotNull(result);
     }
@@ -48,11 +48,11 @@ public class UserTest {
     @Test
     public void updateUser() throws Exception {
         BackendUserDTO userDTO = new BackendUserDTO();
-        userDTO.setPassword("123456");
+        //userDTO.setPassword("123456");
         userDTO.setMobile("1388888888");
         userDTO.setUsername("99967");
         userDTO.setUserId(1L);
-        userService.update(userDTO);
+        //userService.update(userDTO);
     }
 
     @Test

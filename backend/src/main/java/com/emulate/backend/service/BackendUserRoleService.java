@@ -45,7 +45,7 @@ public class BackendUserRoleService extends ServiceImpl<BackendUserRoleDao, Back
 
     }
 
-    public List<Long> queryRoleIdList(Long userId) {
+    public List<Long> findRoleIdList(Long userId) {
         return baseMapper.queryRoleIdList(userId);
     }
 
@@ -54,7 +54,7 @@ public class BackendUserRoleService extends ServiceImpl<BackendUserRoleDao, Back
         return baseMapper.deleteBatch(roleIds);
     }
 
-    public Map<Long, List<Long>> queryRoleIdList(Long... userId) {
+    public Map<Long, List<Long>> findRoleIdList(Long... userId) {
         if (userId == null || userId.length == 0) {
             return new HashMap<>();
         }
@@ -64,15 +64,27 @@ public class BackendUserRoleService extends ServiceImpl<BackendUserRoleDao, Back
                 selectList(queryWrapper);
         Map<Long, List<Long>> result = list.
                 stream().
+                map(BackendUserRoleEntity::getUserId).
+                collect(Collectors.toList()).
+                stream().
+                distinct().
                 collect(
-                        Collectors.toMap(BackendUserRoleEntity::getUserId,
-                                e -> list.stream().
-										filter(a -> e.getUserId().equals(a.getUserId())).
-										map(BackendUserRoleEntity::getRoleId).
-										collect(Collectors.toList())
+                        Collectors.toMap(a -> a,
+                                id -> list.stream().
+                                        filter(userRole -> id.equals(userRole.getUserId())).
+                                        map(BackendUserRoleEntity::getRoleId).
+                                        collect(Collectors.toList())
                         ));
         return result;
     }
 
-
+    @Transactional
+    public void deleteRoleByUserId(Long... id) {
+        if (id == null || id.length == 0){
+            return;
+        }
+        QueryWrapper<BackendUserRoleEntity> queryWrapper =  new QueryWrapper();
+        queryWrapper.in("user_id",id);
+        baseMapper.delete(queryWrapper);
+    }
 }
