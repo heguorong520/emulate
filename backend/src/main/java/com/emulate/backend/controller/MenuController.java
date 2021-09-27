@@ -41,17 +41,25 @@ public class MenuController extends BaseController {
      */
     @GetMapping("menu/nav")
     public ResultBody<BackendMenuNavDTO> nav() {
-        Long userId = AuthFilter.backendLoginUserDTO().getUserId();
-        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(userId);
+        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(getBackendUserId());
+        return ResultBody.ok(menuList);
+    }
+
+    /**
+     * 所有菜单列表x
+     */
+    @GetMapping("menu/list")
+    public ResultBody<List<BackendMenuNavDTO>> list() {
+        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(null);
         return ResultBody.ok(menuList);
     }
 
     /**
      * 所有菜单列表
      */
-    @GetMapping("menu/list")
-    public ResultBody<List<BackendMenuEntity>> list() {
-        List<BackendMenuEntity> menuList = backendMenuService.list();
+    @GetMapping("menu/role/select")
+    public ResultBody<List<BackendMenuNavDTO>> roleSelect() {
+        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(getBackendUserId());
         return ResultBody.ok(menuList);
     }
 

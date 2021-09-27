@@ -115,7 +115,7 @@ public class BackendMenuService extends ServiceImpl<BackendMenuDao, BackendMenuE
 
 
 		List<BackendMenuEntity> menuList = list.stream().
-				filter(e->e.getParentId().intValue() == MenuTypeEnum.菜单.getValue()).
+				filter(e->e.getType().intValue() == MenuTypeEnum.菜单.getValue()).
 				collect(Collectors.toList());
 
 		//转换

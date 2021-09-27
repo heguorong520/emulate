@@ -5,6 +5,7 @@ package com.emulate.backend.controller;
 
 import com.emulate.backend.dto.BackendUpdatePwdDTO;
 import com.emulate.backend.dto.BackendUserDTO;
+import com.emulate.backend.dto.BackendUserStatusDTO;
 import com.emulate.backend.dto.QueryUserDTO;
 import com.emulate.backend.entity.BackendUserEntity;
 import com.emulate.backend.service.BackendUserRoleService;
@@ -19,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
+
 import java.util.List;
 
 /**
@@ -32,9 +33,6 @@ public class UserController extends BaseController {
     @Autowired
     private BackendUserRoleService backendUserRoleService;
 
-    /**
-     * 所有用户列表
-     */
     @GetMapping("user/list")
     public ResultBody<?> list(@ModelAttribute QueryUserDTO queryUserDTO) {
         PageData page = backendUserService.findPage(queryUserDTO);
@@ -43,9 +41,6 @@ public class UserController extends BaseController {
     }
 
 
-    /**
-     * 修改登录用户密码
-     */
     @PostMapping("user/password")
     public ResultBody<?> password(@RequestBody @Valid BackendUpdatePwdDTO backendUpdatePwdDTO) throws Exception {
         //更新密码
@@ -57,9 +52,6 @@ public class UserController extends BaseController {
         return ResultBody.ok();
     }
 
-    /**
-     * 用户信息
-     */
     @GetMapping("user/info")
     public ResultBody<?> info(Long userId) {
         BackendUserEntity user = backendUserService.getById(userId);
@@ -71,9 +63,6 @@ public class UserController extends BaseController {
         return ResultBody.ok(user);
     }
 
-    /**
-     * 保存用户
-     */
     @PostMapping("user/save")
     public ResultBody<?> save(@Valid @RequestBody BackendUserDTO user) throws Exception {
 
@@ -82,11 +71,6 @@ public class UserController extends BaseController {
         return ResultBody.ok();
     }
 
-
-
-    /**
-     * 删除用户
-     */
     @PostMapping("user/delete")
     public ResultBody<?> delete(@RequestBody Long[] userIds) {
         if (ArrayUtils.contains(userIds, 1L)) {
@@ -97,6 +81,12 @@ public class UserController extends BaseController {
             throw new CustomizeException("当前用户不能删除");
         }
         backendUserService.deleteByUserId(userIds);
+        return ResultBody.ok();
+    }
+
+    @PostMapping("user/status")
+    public ResultBody<?> status(@Valid @RequestBody BackendUserStatusDTO userStatusDTO) {
+        backendUserService.setUserStatus(userStatusDTO);
         return ResultBody.ok();
     }
 }

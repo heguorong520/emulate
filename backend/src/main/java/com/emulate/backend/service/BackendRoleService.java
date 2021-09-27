@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.emulate.backend.dao.BackendRoleDao;
+import com.emulate.backend.dto.QueryRoleDTO;
 import com.emulate.backend.entity.BackendRoleEntity;
 import com.emulate.core.util.PageData;
 import org.springframework.stereotype.Service;
@@ -30,14 +31,11 @@ public class BackendRoleService extends ServiceImpl<BackendRoleDao, BackendRoleE
     private BackendUserRoleService backendUserRoleService;
 
 
-    public PageData findPage(Map<String, Object> params) {
-        String roleName = (String) params.get("roleName");
-
+    public PageData findPage(QueryRoleDTO queryRoleDTO) {
         IPage<BackendRoleEntity> page = this.page(
-                new Page<>(1, 2),
+                new Page<>(queryRoleDTO.getPage(), queryRoleDTO.getLimit()),
                 new QueryWrapper<BackendRoleEntity>()
-                        .like(ObjectUtil.isNotEmpty(roleName), "role_name", roleName));
-
+                        .like(ObjectUtil.isNotEmpty(queryRoleDTO.getRoleName()), "role_name", queryRoleDTO.getRoleName()));
         return new PageData(page);
     }
 

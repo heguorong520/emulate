@@ -3,6 +3,7 @@ package com.emulate.core.filter;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.HeaderKeyEnum;
@@ -42,7 +43,7 @@ public class SignFilter extends BaseFilter {
         }
         try {
             TreeMap<String, Object> paramMap = verifyHeadAndGetHeadParams(request, response);
-            getRequestParams(request, paramMap);
+            request = getRequestParams(request, paramMap);
             verifySign(response, paramMap);
             chain.doFilter(request, response);
         }catch (Exception e){
@@ -79,9 +80,19 @@ public class SignFilter extends BaseFilter {
         paramMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(e -> {
-                    if (!HeaderKeyEnum.SIGN.getName().equals(e.getKey()) || !HeaderKeyEnum.AUTHORIZATION.getName().equals(e.getKey())) {
-                        stringBuffer.append(e.getKey() + "=" + e.getValue());
-                        stringBuffer.append("&");
+                    if (!HeaderKeyEnum.SIGN.getName().equals(e.getKey()) && !HeaderKeyEnum.AUTHORIZATION.getName().equals(e.getKey())) {
+                        if(ObjectUtil.isNotEmpty(e.getValue())) {
+                            String value = "";
+                            if(e.getValue() instanceof JSONObject ){
+                                value = JSONObject.toJSONString(e.getValue());
+                            }else if(e.getValue() instanceof JSONArray){
+                                value = JSONObject.toJSONString(e.getValue());
+                            }else{
+                                value =  e.getValue().toString();
+                            }
+                            stringBuffer.append(e.getKey() + "=" + value);
+                            stringBuffer.append("&");
+                        }
                     }
                 });
         stringBuffer.append(AESUtil.SIGN_KEY);
@@ -105,7 +116,7 @@ public class SignFilter extends BaseFilter {
         //校验请求头参数
         for (HeaderKeyEnum headerKeyEnum : HeaderKeyEnum.values()) {
             String value = request.getHeader(headerKeyEnum.getName());
-            if (ObjectUtil.isEmpty(value)) {
+            if (ObjectUtil.isEmpty(value) && !headerKeyEnum.getName().equals(HeaderKeyEnum.AUTHORIZATION.getName())) {
                 log.info("请求头异常原因：{}",headerKeyEnum.getMsg());
                 this.writeError(response, GlobalErrorEnum.签名异常);
             }
@@ -121,23 +132,43 @@ public class SignFilter extends BaseFilter {
      * @param paramMap
      * @throws IOException
      */
-    public void getRequestParams(HttpServletRequest request, TreeMap<String, Object> paramMap) throws IOException {
+    public HttpServletRequest getRequestParams(HttpServletRequest request, TreeMap<String, Object> paramMap) throws IOException {
         //URL参数获取
         Enumeration<String> paramNames = request.getParameterNames();
         while (request.getParameterNames().hasMoreElements()) {
-            String name = paramNames.nextElement();
-            paramMap.put(name, request.getParameter(name));
+            try {
+                String name = paramNames.nextElement();
+                if (name != null) {
+                    paramMap.put(name, request.getParameter(name));
+                }
+            }catch (Exception e){
+                break;
+            }
         }
         //Body参数获取
         if (request.getInputStream() != null) {
             String body = IOUtils.toString(request.getInputStream(), "utf-8");
-            if (ObjectUtil.isNotEmpty(body)) {
+            //body数组处理
+            if (ObjectUtil.isNotEmpty(body) && body.startsWith("[")) {
+                JSONArray array = JSONArray.parseArray(body);
+                for(int i=0; i<array.size();i++){
+                    try{
+                        String value = array.getJSONObject(i).toJSONString();
+                        paramMap.put(i+"",value);
+                    }catch (Exception e){
+                        String value = array.get(i).toString();
+                        paramMap.put(i+"",value);
+                    }
+                }
+            }else if(ObjectUtil.isNotEmpty(body) && body.startsWith("{")){ //对象处理
                 JSONObject json = JSONObject.parseObject(body);
                 paramMap.putAll(BeanUtil.beanToMap(json));
             }
+            //body里面除了对象和数组加入签名算法其他的不加入
             //防止body丢失
-            request = new MyHttpServletRequest(request, body);
+            return new MyHttpServletRequest(request, body);
         }
+        return request;
     }
 
 

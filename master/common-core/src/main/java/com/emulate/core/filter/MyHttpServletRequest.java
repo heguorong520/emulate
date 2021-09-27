@@ -1,21 +1,19 @@
 package com.emulate.core.filter;
 
 
-import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class MyHttpServletRequest extends HttpServletRequestWrapper {
 
     private byte[] body;
+
 
     /**
      * Constructs a request object wrapping the given request.
@@ -56,4 +54,11 @@ public class MyHttpServletRequest extends HttpServletRequestWrapper {
         };
         return  servletIns;
     }
+    @Override
+    public BufferedReader getReader() {
+        InputStream sourceStream = new ByteArrayInputStream(this.body);
+        Reader  sourceReader = new InputStreamReader(sourceStream, Charset.forName("utf-8"));
+       return  new BufferedReader(sourceReader);
+    }
+
 }

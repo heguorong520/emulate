@@ -7,14 +7,12 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.emulate.backend.dao.BackendUserDao;
-import com.emulate.backend.dto.BackendLoginDTO;
-import com.emulate.backend.dto.BackendLoginResultDTO;
-import com.emulate.backend.dto.BackendUserDTO;
-import com.emulate.backend.dto.QueryUserDTO;
+import com.emulate.backend.dto.*;
 import com.emulate.backend.entity.BackendUserEntity;
 import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.RedisCacheKeyEnum;
@@ -58,7 +56,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
                 new Page<>(userBodyDTO.getPage(), userBodyDTO.getLimit()),
                 new QueryWrapper<BackendUserEntity>().
                         eq(StringUtils.isNotBlank(userBodyDTO.getUsername()), "username", userBodyDTO.getUsername()).
-                        eq(StringUtils.isNotBlank(userBodyDTO.getNickname()),"nickname",userBodyDTO.getNickname()).
+                        eq(StringUtils.isNotBlank(userBodyDTO.getNickname()), "nickname", userBodyDTO.getNickname()).
                         orderByDesc("create_time")
         );
         //角色列表
@@ -94,17 +92,17 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveUser( BackendUserDTO userDTO) {
+    public void saveUser(BackendUserDTO userDTO) {
         BackendUserEntity user = Convert.convert(BackendUserEntity.class, userDTO);
-        if(user.getUserId() == null) {
+        if (user.getUserId() == null) {
             user.setPassword(AESUtil.encrypt("123456", AESUtil.PASSWORD_KEY));
+            user.setSalt(AESUtil.PASSWORD_KEY);
         }
+        user.setStatus(0);
         this.saveOrUpdate(user);
         //保存用户与角色关系
         backendUserRoleService.saveOrUpdate(user.getUserId(), user.getRoleIdList());
     }
-
-
 
 
     @Transactional
@@ -171,8 +169,17 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
     }
 
     @Transactional
-    public void deleteByUserId(Long ...id){
+    public void deleteByUserId(Long... id) {
         baseMapper.deleteBatchIds(Arrays.stream(id).collect(Collectors.toList()));
         backendUserRoleService.deleteRoleByUserId(id);
+    }
+
+    @Transactional
+    public void setUserStatus(BackendUserStatusDTO userStatusDTO) {
+        //设置用户状态e
+        UpdateWrapper<BackendUserEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("status",userStatusDTO.getStatus());
+        updateWrapper.eq("user_id",userStatusDTO.getStatus());
+        baseMapper.update(null,updateWrapper);
     }
 }

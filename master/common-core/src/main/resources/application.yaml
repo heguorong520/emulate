@@ -52,7 +52,7 @@ mybatis-plus:
 #s代表不需要签名a代表不需要登录,sa不需要验签不需要鉴权,定义接口遵循规则配置简洁
 emulate:
   auth-sign:
-    enable-sign: false
+    enable-sign: true
     no-sign-list:
       - /api/s/**
       - /api/sa/**

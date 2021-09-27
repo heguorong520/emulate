@@ -2,6 +2,7 @@
 package com.emulate.backend.controller;
 
 
+import com.emulate.backend.dto.QueryRoleDTO;
 import com.emulate.backend.entity.BackendRoleEntity;
 import com.emulate.backend.service.BackendRoleMenuService;
 import com.emulate.backend.service.BackendRoleService;
@@ -34,9 +35,8 @@ public class RoleController extends BaseController {
      * @return
      */
     @GetMapping("role/list")
-    public ResultBody<?> list(@RequestParam Map<String, Object> params) {
-        PageData page = backendRoleService.findPage(params);
-
+    public ResultBody<?> list(@ModelAttribute QueryRoleDTO queryRoleDTO) {
+        PageData page = backendRoleService.findPage(queryRoleDTO);
         return ResultBody.ok(page);
     }
 
@@ -46,7 +46,6 @@ public class RoleController extends BaseController {
     @GetMapping("role/select")
     public ResultBody<?> select() {
         List<BackendRoleEntity> list = backendRoleService.list();
-
         return ResultBody.ok(list);
     }
 
@@ -56,12 +55,9 @@ public class RoleController extends BaseController {
     @GetMapping("role/info")
     public ResultBody<?> info(Long roleId) {
         BackendRoleEntity role = backendRoleService.getById(roleId);
-
         //查询角色对应的菜单
         List<Long> menuIdList = backendRoleMenuService.findMenuIdList(roleId);
         role.setMenuIdList(menuIdList);
-
-
         return ResultBody.ok(role);
     }
 
