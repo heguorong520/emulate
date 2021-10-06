@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,27 +37,18 @@ public class MenuController extends BaseController {
     @Autowired
     private BackendMenuService backendMenuService;
 
-    /**
-     * 导航菜单
-     */
     @GetMapping("menu/nav")
     public ResultBody<BackendMenuNavDTO> nav() {
         List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(getBackendUserId());
         return ResultBody.ok(menuList);
     }
 
-    /**
-     * 所有菜单列表x
-     */
     @GetMapping("menu/list")
-    public ResultBody<List<BackendMenuNavDTO>> list() {
-        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(null);
+    public ResultBody<List<BackendMenuEntity>> list() {
+        List<BackendMenuEntity> menuList = backendMenuService.list(null);
         return ResultBody.ok(menuList);
     }
 
-    /**
-     * 所有菜单列表
-     */
     @GetMapping("menu/role/select")
     public ResultBody<List<BackendMenuNavDTO>> roleSelect() {
         List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(getBackendUserId());
@@ -67,19 +59,18 @@ public class MenuController extends BaseController {
      * 选择菜单(添加、修改菜单)
      */
     @GetMapping("menu/select")
-    public ResultBody<List<BackendMenuEntity>> select() {
+    public ResultBody<List<BackendMenuNavDTO>> select() {
         //查询列表数据
-        List<BackendMenuEntity> menuList = backendMenuService.findNotButtonList();
-
+        List<BackendMenuNavDTO> menuList = backendMenuService.findNotButtonList();
         //添加顶级菜单
-        BackendMenuEntity root = new BackendMenuEntity();
+        BackendMenuNavDTO root = new BackendMenuNavDTO();
         root.setMenuId(0L);
-        root.setName("一级菜单");
-        root.setParentId(-1L);
-        root.setOpen(true);
-        menuList.add(root);
-
-        return ResultBody.ok(menuList);
+        root.setName("目录上级");
+        root.setParentId(0L);
+        root.setChild(menuList);
+        List<BackendMenuNavDTO> result = new ArrayList<>();
+        result.add(root);
+        return ResultBody.ok(result);
     }
 
     /**
@@ -98,7 +89,7 @@ public class MenuController extends BaseController {
     public ResultBody<?> save(@Valid  @RequestBody BackendMenuEntity menu) {
         verifyForm(menu);
 
-        backendMenuService.save(menu);
+        backendMenuService.saveOrUpdate(menu);
 
         return ResultBody.ok();
     }
@@ -119,19 +110,16 @@ public class MenuController extends BaseController {
      * 删除
      */
     @GetMapping("menu/delete")
-    public ResultBody<?> delete(long menuId) {
-        if (menuId <= 31) {
+    public ResultBody<?> delete(Long id) {
+        if (id <= 31) {
             return ResultBody.error(GlobalErrorEnum.不能删除);
         }
-
         //判断是否有子菜单或按钮
-        List<BackendMenuEntity> menuList = backendMenuService.findListParentId(menuId);
+        List<BackendMenuEntity> menuList = backendMenuService.findListParentId(id);
         if (menuList.size() > 0) {
             return ResultBody.error(GlobalErrorEnum.存在子节点);
         }
-
-        backendMenuService.delete(menuId);
-
+        backendMenuService.delete(id);
         return ResultBody.ok();
     }
 

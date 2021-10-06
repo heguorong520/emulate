@@ -11,13 +11,16 @@ import com.emulate.backend.dao.BackendMenuDao;
 import com.emulate.backend.dto.BackendMenuNavDTO;
 import com.emulate.backend.emums.MenuTypeEnum;
 import com.emulate.backend.entity.BackendMenuEntity;
+import com.emulate.backend.entity.BackendRoleEntity;
 import com.emulate.backend.entity.BackendRoleMenuEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -37,8 +40,9 @@ public class BackendMenuService extends ServiceImpl<BackendMenuDao, BackendMenuE
 		return baseMapper.queryListParentId(parentId);
 	}
 
-	public List<BackendMenuEntity> findNotButtonList() {
-		return baseMapper.queryNotButtonList();
+	public List<BackendMenuNavDTO> findNotButtonList() {
+		List<BackendMenuEntity> list = baseMapper.queryNotButtonList();
+		return menuDeal(list);
 	}
 
 	public List<BackendMenuNavDTO> findUserMenuList(Long userId) {
@@ -126,4 +130,22 @@ public class BackendMenuService extends ServiceImpl<BackendMenuDao, BackendMenuE
 		return  navList;
 	}
 
+	public Map<Long, String> findMenuNameMap(List<Long> ids) {
+		Map<Long, String> result = new HashMap<>();
+		if (ObjectUtil.isEmpty(ids)) {
+			return result;
+		}
+		QueryWrapper<BackendMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.in("menu_id", ids);
+		List<BackendMenuEntity> menuList = this.baseMapper.selectList(queryWrapper);
+		result = menuList.stream().
+				collect(
+						Collectors.
+								toMap(
+										BackendMenuEntity::getMenuId,
+										BackendMenuEntity::getName
+								)
+				);
+		return result;
+	}
 }

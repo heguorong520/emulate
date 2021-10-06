@@ -16,6 +16,11 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- apo -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
         <!-- 加密填充方式 -->
         <dependency>
             <groupId>org.bouncycastle</groupId>

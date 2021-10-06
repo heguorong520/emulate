@@ -1,6 +1,6 @@
  
 
-package com.emulate.core.util;
+package com.emulate.core.utils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

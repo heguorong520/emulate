@@ -28,8 +28,8 @@ public class BaseFilter extends OncePerRequestFilter {
     protected void writeError(HttpServletResponse response, GlobalErrorEnum errorEnum) throws IOException {
         response.setCharacterEncoding("utf-8");
         response.setContentType("application/json;charset=utf-8");
-        response.getWriter().write( JSONObject.toJSONString(ResultBody.error(errorEnum)));
-        throw new CustomizeException(errorEnum);
+        response.setStatus(errorEnum.getCode());
+        response.getWriter().write(JSONObject.toJSONString(ResultBody.error(errorEnum)));
     }
 
     /**

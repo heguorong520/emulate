@@ -3,6 +3,7 @@
 package com.emulate.backend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.emulate.backend.dao.BackendUserRoleDao;
 import com.emulate.backend.entity.BackendUserRoleEntity;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -86,5 +89,24 @@ public class BackendUserRoleService extends ServiceImpl<BackendUserRoleDao, Back
         QueryWrapper<BackendUserRoleEntity> queryWrapper =  new QueryWrapper();
         queryWrapper.in("user_id",id);
         baseMapper.delete(queryWrapper);
+    }
+
+
+    public   Map<Long,Integer> findRoleUserCountMap(List<Long> roleIds) {
+        if (roleIds == null || roleIds.size() == 0) {
+            return new HashMap<>();
+        }
+        QueryWrapper<BackendUserRoleEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("count(user_id) as count","role_id as roleId");
+        queryWrapper.in("role_id", roleIds);
+        queryWrapper.groupBy("role_id");
+        List<Map<String,Object>> list = baseMapper.selectMaps(queryWrapper);
+        Map<Long,Integer> userCountMaps = list.
+                stream().
+                collect(Collectors.
+                        toMap(map->Long.valueOf(map.get("roleId").toString()),
+                        map->Integer.valueOf(map.get("count").toString()))
+                );
+        return userCountMaps;
     }
 }

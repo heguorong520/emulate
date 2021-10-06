@@ -14,7 +14,7 @@ import com.emulate.core.controller.BaseController;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.result.ResultBody;
-import com.emulate.core.util.PageData;
+import com.emulate.core.utils.PageData;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

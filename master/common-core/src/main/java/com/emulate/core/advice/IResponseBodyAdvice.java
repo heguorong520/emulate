@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class IResponseBodyAdvice implements ResponseBodyAdvice {
     @Override
     public boolean supports(MethodParameter methodParameter, Class aClass) {
+        //接口返回后清理Local线程的数据
         if(AuthFilter.backendUser.get()!=null) {
             AuthFilter.backendUser.remove();
         }
@@ -25,4 +26,5 @@ public class IResponseBodyAdvice implements ResponseBodyAdvice {
     public Object beforeBodyWrite(Object o, MethodParameter methodParameter, MediaType mediaType, Class aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
         return o;
     }
+
 }

@@ -4,7 +4,6 @@ package com.emulate.backend.service;
 
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -20,8 +19,8 @@ import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.jwt.TokenUtil;
 import com.emulate.core.user.LoginUserDTO;
-import com.emulate.core.util.AESUtil;
-import com.emulate.core.util.PageData;
+import com.emulate.core.utils.AESUtil;
+import com.emulate.core.utils.PageData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -161,7 +160,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
     public void logout() {
         LoginUserDTO userDTO = AuthFilter.backendLoginUserDTO();
         if (userDTO == null) {
-            throw new CustomizeException(GlobalErrorEnum.未登录);
+            throw new CustomizeException(GlobalErrorEnum.无权访问);
         }
         //清理缓存中的TOKEN即可
         String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + userDTO.getUserId();
@@ -179,7 +178,9 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         //设置用户状态e
         UpdateWrapper<BackendUserEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.set("status",userStatusDTO.getStatus());
-        updateWrapper.eq("user_id",userStatusDTO.getStatus());
+        updateWrapper.eq("user_id",userStatusDTO.getUserId());
         baseMapper.update(null,updateWrapper);
     }
+
+
 }

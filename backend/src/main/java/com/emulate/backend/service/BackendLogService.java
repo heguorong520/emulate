@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.emulate.backend.dao.BackendLogDao;
 import com.emulate.backend.dto.QueryLogDTO;
 import com.emulate.backend.entity.BackendLogEntity;
-import com.emulate.core.util.PageData;
+import com.emulate.core.utils.PageData;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

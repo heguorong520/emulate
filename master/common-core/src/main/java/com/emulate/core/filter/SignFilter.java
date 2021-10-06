@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.HeaderKeyEnum;
-import com.emulate.core.util.AESUtil;
+import com.emulate.core.utils.AESUtil;
 import com.emulate.core.yml.AuthSignYml;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -41,14 +41,27 @@ public class SignFilter extends BaseFilter {
             chain.doFilter(request, response);
             return;
         }
-        try {
-            TreeMap<String, Object> paramMap = verifyHeadAndGetHeadParams(request, response);
+        TreeMap<String, Object> paramMap = new TreeMap<>();
+        //校验请求头参数
+        for (HeaderKeyEnum headerKeyEnum : HeaderKeyEnum.values()) {
+            String value = request.getHeader(headerKeyEnum.getName());
+            if (ObjectUtil.isEmpty(value) && !headerKeyEnum.getName().equals(HeaderKeyEnum.AUTHORIZATION.getName())) {
+                log.info("请求头异常原因：{}", headerKeyEnum.getMsg());
+                this.writeError(response,GlobalErrorEnum.签名异常);
+                return;
+            }
+            paramMap.put(headerKeyEnum.getName(), value);
+        }
+        try{
             request = getRequestParams(request, paramMap);
-            verifySign(response, paramMap);
-            chain.doFilter(request, response);
         }catch (Exception e){
+            log.info("获取参数异常原因：{}", e);
+        }
+        if(!verifySign(response, paramMap)){
+            this.writeError(response,GlobalErrorEnum.签名异常);
             return;
         }
+        chain.doFilter(request, response);
     }
 
 
@@ -57,14 +70,14 @@ public class SignFilter extends BaseFilter {
      *
      * @param paramMap
      */
-    public void verifySign(HttpServletResponse response, TreeMap<String, Object> paramMap) throws IOException {
+    public boolean verifySign(HttpServletResponse response, TreeMap<String, Object> paramMap) throws IOException {
         String random = (String) paramMap.get(HeaderKeyEnum.RANDOM.getName());
         String timeStr = (String) paramMap.get(HeaderKeyEnum.TIME.getName());
         // 服务端加签密文 = 加签方法(私钥+参数生产);
         String redisRandom = (String) redisTemplate.opsForValue().get(random);
         if (null != redisRandom) {
             log.info("RANDOM:{},在5分中内使用过", random);
-            this.writeError(response, GlobalErrorEnum.签名异常);
+            return false;
         }
 
         redisTemplate.opsForValue().set(random, random, 5, TimeUnit.MINUTES);
@@ -72,7 +85,7 @@ public class SignFilter extends BaseFilter {
         Long time = Long.valueOf(timeStr) + 60L * 1000L;
         if (System.currentTimeMillis() >= time) {
             log.info("time:{},请求发起时间超过一分钟");
-            this.writeError(response, GlobalErrorEnum.签名异常);
+            return false;
         }
         redisTemplate.opsForValue().set(random, random);
         //签名校验
@@ -101,28 +114,9 @@ public class SignFilter extends BaseFilter {
         if (!headerSign.equals(signStr)) {
             log.info("headerSign:{}", headerSign);
             log.info("signStr:{}", signStr);
-            this.writeError(response, GlobalErrorEnum.签名异常);
+            return false;
         }
-    }
-
-    /**
-     * 校验请求头数据并获取请求头数据
-     *
-     * @param request
-     * @return
-     */
-    public TreeMap<String, Object> verifyHeadAndGetHeadParams(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        TreeMap<String, Object> paramMap = new TreeMap<>();
-        //校验请求头参数
-        for (HeaderKeyEnum headerKeyEnum : HeaderKeyEnum.values()) {
-            String value = request.getHeader(headerKeyEnum.getName());
-            if (ObjectUtil.isEmpty(value) && !headerKeyEnum.getName().equals(HeaderKeyEnum.AUTHORIZATION.getName())) {
-                log.info("请求头异常原因：{}",headerKeyEnum.getMsg());
-                this.writeError(response, GlobalErrorEnum.签名异常);
-            }
-            paramMap.put(headerKeyEnum.getName(), value);
-        }
-        return paramMap;
+        return true;
     }
 
     /**

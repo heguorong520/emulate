@@ -12,6 +12,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +48,10 @@ public class BackendRoleEntity implements Serializable {
 	 */
 	private Long deptId;
 
+
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date createTime;
 	/**
 	 * 部门名称
 	 */
@@ -55,12 +60,25 @@ public class BackendRoleEntity implements Serializable {
 
 	@TableField(exist=false)
 	private List<Long> menuIdList;
+
+	@TableField(exist=false)
+	private List<String> menuNameList;
+
 	@TableField(exist=false)
 	private List<Long> deptIdList;
-	
-	/**
-	 * 创建时间
-	 */
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date createTime;
+	@TableField(exist=false)
+	public Integer userCount=0;
+
+	public List<String> getMenuNameList(){
+		if(menuNameList == null){
+			menuNameList = new ArrayList<>();
+		}
+		return menuNameList;
+	}
+	public List<Long> getMenuIdList(){
+		if(menuIdList == null){
+			menuIdList = new ArrayList<>();
+		}
+		return menuIdList;
+	}
 }

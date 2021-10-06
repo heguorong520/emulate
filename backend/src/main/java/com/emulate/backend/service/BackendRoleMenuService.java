@@ -3,13 +3,18 @@
 package com.emulate.backend.service;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.emulate.backend.dao.BackendRoleMenuDao;
 import com.emulate.backend.entity.BackendRoleMenuEntity;
+import com.emulate.backend.entity.BackendUserRoleEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 角色与菜单对应关系
@@ -46,4 +51,27 @@ public class BackendRoleMenuService extends ServiceImpl<BackendRoleMenuDao, Back
 		return baseMapper.deleteBatch(roleIds);
 	}
 
+	public Map<Long, List<Long>> findMenuIdList(Long... roleId) {
+		if (roleId == null || roleId.length == 0) {
+			return new HashMap<>();
+		}
+		QueryWrapper<BackendRoleMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.in("role_id", roleId);
+		List<BackendRoleMenuEntity> list = baseMapper.
+				selectList(queryWrapper);
+		Map<Long, List<Long>> result = list.
+				stream().
+				map(BackendRoleMenuEntity::getRoleId).
+				collect(Collectors.toList()).
+				stream().
+				distinct().
+				collect(
+						Collectors.toMap(a -> a,
+								id -> list.stream().
+										filter(userRole -> id.equals(userRole.getRoleId())).
+										map(BackendRoleMenuEntity::getMenuId).
+										collect(Collectors.toList())
+						));
+		return result;
+	}
 }

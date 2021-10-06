@@ -2,19 +2,19 @@
 package com.emulate.backend.controller;
 
 
+import com.emulate.backend.dto.BackendRoleDTO;
 import com.emulate.backend.dto.QueryRoleDTO;
 import com.emulate.backend.entity.BackendRoleEntity;
 import com.emulate.backend.service.BackendRoleMenuService;
 import com.emulate.backend.service.BackendRoleService;
 import com.emulate.core.controller.BaseController;
 import com.emulate.core.result.ResultBody;
-import com.emulate.core.util.PageData;
+import com.emulate.core.utils.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 角色管理
@@ -64,29 +64,19 @@ public class RoleController extends BaseController {
     /**
      * 保存角色
      */
-    @PostMapping("/save")
-    public ResultBody<?> save(@Valid @RequestBody BackendRoleEntity role) {
+    @PostMapping("role/save")
+    public ResultBody<?> save(@Valid @RequestBody BackendRoleDTO role) {
 
         backendRoleService.saveRole(role);
 
         return ResultBody.ok();
     }
 
-    /**
-     * 修改角色
-     */
-    @PostMapping("/update")
-    public  ResultBody<?>  update(@RequestBody BackendRoleEntity role) {
-
-        backendRoleService.update(role);
-
-        return ResultBody.ok();
-    }
 
     /**
      * 删除角色
      */
-    @PostMapping("/delete")
+    @PostMapping("role/delete")
     public ResultBody delete(@RequestBody Long[] roleIds) {
         backendRoleService.deleteBatch(roleIds);
 

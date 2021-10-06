@@ -21,6 +21,8 @@ public class BackendMenuNavDTO implements Serializable {
 
     public Integer shortcut;
 
+    public Long parentId;
+
     public List<BackendMenuNavDTO> child;
 
     public Long menuId;

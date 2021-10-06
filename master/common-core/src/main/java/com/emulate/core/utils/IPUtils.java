@@ -1,6 +1,6 @@
  
 
-package com.emulate.core.util;
+package com.emulate.core.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import org.slf4j.Logger;

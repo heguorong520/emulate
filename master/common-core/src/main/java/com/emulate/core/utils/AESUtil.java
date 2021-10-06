@@ -1,4 +1,4 @@
-package com.emulate.core.util;
+package com.emulate.core.utils;
 
 import com.emulate.core.excetion.CustomizeException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
