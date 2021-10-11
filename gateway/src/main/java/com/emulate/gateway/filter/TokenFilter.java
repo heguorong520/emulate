@@ -1,19 +1,15 @@
 package com.emulate.gateway.filter;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.HeaderKeyEnum;
-import com.emulate.core.enums.RedisCacheKeyEnum;
 import com.emulate.core.jwt.TokenUtil;
 import com.emulate.core.result.ResultBody;
-import com.emulate.core.user.LoginUserDTO;
 import com.emulate.core.yml.AuthSignYml;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.http.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -28,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import reactor.netty.http.server.HttpServerRequest;
 
 import java.util.List;
 

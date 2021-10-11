@@ -1,4 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.emulate.core.yml.AuthSignYml
+  com.emulate.core.yml.AuthSignYml, \
+  com.emulate.core.handler.CustomizeExceptionHandler
 
 
