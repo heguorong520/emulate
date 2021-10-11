@@ -5,10 +5,10 @@ import com.emulate.backend.dto.QueryLogDTO;
 import com.emulate.backend.entity.BackendLogEntity;
 import com.emulate.backend.service.BackendLogService;
 
-import com.emulate.core.annotation.BackendShiroValidate;
+import com.emulate.core.annotation.ShiroValidate;
 import com.emulate.core.controller.BaseController;
 import com.emulate.core.result.ResultBody;
-import com.emulate.core.utils.PageData;
+import com.emulate.database.page.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +29,7 @@ public class LogController  extends BaseController {
 
 	@ResponseBody
 	@GetMapping("/log/list")
-	@BackendShiroValidate(perms = "list:log")
+	@ShiroValidate(perms = "list:log")
 	public ResultBody<BackendLogEntity> list(@ModelAttribute QueryLogDTO queryLogDTO){
 		PageData<BackendLogEntity> page = sysLogService.findPage(queryLogDTO);
 		return ResultBody.ok(page);

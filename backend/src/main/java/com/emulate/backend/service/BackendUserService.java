@@ -3,7 +3,9 @@
 package com.emulate.backend.service;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -16,11 +18,10 @@ import com.emulate.backend.entity.BackendUserEntity;
 import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.RedisCacheKeyEnum;
 import com.emulate.core.excetion.CustomizeException;
-import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.jwt.TokenUtil;
 import com.emulate.core.user.LoginUserDTO;
 import com.emulate.core.utils.AESUtil;
-import com.emulate.core.utils.PageData;
+import com.emulate.database.page.PageData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -151,6 +152,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         resultDTO.setUserId(backendUserEntity.getUserId());
         resultDTO.setUsername(backendUserEntity.getUsername());
         resultDTO.setToken(token);
+        resultDTO.setPerms(findUserPerms(backendUserEntity.getUserId()));
         return resultDTO;
     }
 
@@ -158,7 +160,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
      * 注销
      */
     public void logout() {
-        LoginUserDTO userDTO = AuthFilter.backendLoginUserDTO();
+        LoginUserDTO userDTO = null;//AuthFilter.backendLoginUserDTO();
         if (userDTO == null) {
             throw new CustomizeException(GlobalErrorEnum.无权访问);
         }
@@ -177,9 +179,21 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
     public void setUserStatus(BackendUserStatusDTO userStatusDTO) {
         //设置用户状态e
         UpdateWrapper<BackendUserEntity> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.set("status",userStatusDTO.getStatus());
-        updateWrapper.eq("user_id",userStatusDTO.getUserId());
-        baseMapper.update(null,updateWrapper);
+        updateWrapper.set("status", userStatusDTO.getStatus());
+        updateWrapper.eq("user_id", userStatusDTO.getUserId());
+        baseMapper.update(null, updateWrapper);
+    }
+
+    public List<String> findUserPerms(Long userId) {
+        List<String> permsList = baseMapper.queryAllPerms(userId);
+        List<String> result = new ArrayList<>();
+        for (String p : permsList) {
+            if (ObjectUtil.isEmpty(p)) {
+                continue;
+            }
+            result.addAll(CollUtil.toList(p.split(",")));
+        }
+        return result;
     }
 
 

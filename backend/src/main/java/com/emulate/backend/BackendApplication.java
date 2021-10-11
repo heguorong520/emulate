@@ -10,7 +10,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @Slf4j
-@SpringBootApplication(scanBasePackages = {"com.emulate.core","com.emulate.backend"})
+@SpringBootApplication()
 public class BackendApplication {
     public static void main(String[] args) throws UnknownHostException {
         ConfigurableApplicationContext application = SpringApplication.run(BackendApplication.class,args);

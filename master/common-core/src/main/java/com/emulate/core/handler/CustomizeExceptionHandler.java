@@ -13,7 +13,7 @@ import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.result.ResultBody;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
+//import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -37,12 +37,12 @@ public class CustomizeExceptionHandler {
         r.setMsg(e.getMessage());
         return r;
     }
-
+/*
     @ExceptionHandler(DuplicateKeyException.class)
     public ResultBody handleDuplicateKeyException(DuplicateKeyException e) {
         log.error(e.getMessage(), e);
         return ResultBody.error(GlobalErrorEnum.数据已存在);
-    }
+    }*/
 
 
     @ExceptionHandler(Exception.class)

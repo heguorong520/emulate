@@ -14,5 +14,19 @@
     </parent>
     <modules>
         <module>common-core</module>
+        <module>common-redis</module>
+        <module>common-database</module>
+        <module>common-swagger</module>
     </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

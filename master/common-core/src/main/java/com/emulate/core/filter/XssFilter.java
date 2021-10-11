@@ -1,7 +1,9 @@
 package com.emulate.core.filter;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -66,7 +68,8 @@ public class XssFilter  implements Filter {
     private boolean matches(String url, List<String> excludes){
         boolean result = false;
         for(String exclude : excludes){
-            if(StringUtils.matches(url, exclude)){
+            PathMatcher pathMatcher = new AntPathMatcher();
+            if(pathMatcher.match(url, exclude)){
                 result = true;
                 break;
             }

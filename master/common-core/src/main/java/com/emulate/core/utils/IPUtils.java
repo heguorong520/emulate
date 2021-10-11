@@ -5,6 +5,7 @@ package com.emulate.core.utils;
 import cn.hutool.core.util.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,9 +16,10 @@ public class IPUtils {
 	private static Logger logger = LoggerFactory.getLogger(IPUtils.class);
 
 
-	public static String getIpAddr(HttpServletRequest request) {
+	public static String getIpAddr() {
     	String ip = null;
         try {
+            HttpServletRequest request = HttpRequestUtil.getHttpServletRequest();
             //可以让运维在转发的时候在header设置特殊字段存储用户真实IP
             ip = request.getHeader("x-forwarded-for");
             if (ObjectUtil.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {

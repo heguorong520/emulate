@@ -16,7 +16,6 @@ import com.emulate.backend.service.BackendMenuService;
 import com.emulate.core.controller.BaseController;
 import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.excetion.CustomizeException;
-import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.result.ResultBody;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,7 +26,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 系统菜单

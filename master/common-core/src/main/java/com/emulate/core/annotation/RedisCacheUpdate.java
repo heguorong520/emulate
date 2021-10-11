@@ -5,9 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * 缓存更新
- */
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface RedisCacheUpdate {

@@ -12,9 +12,8 @@ import com.emulate.backend.service.BackendUserRoleService;
 import com.emulate.backend.service.BackendUserService;
 import com.emulate.core.controller.BaseController;
 import com.emulate.core.excetion.CustomizeException;
-import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.result.ResultBody;
-import com.emulate.core.utils.PageData;
+import com.emulate.database.page.PageData;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +43,7 @@ public class UserController extends BaseController {
     @PostMapping("user/password")
     public ResultBody<?> password(@RequestBody @Valid BackendUpdatePwdDTO backendUpdatePwdDTO) throws Exception {
         //更新密码
-        boolean flag = backendUserService.updatePassword(AuthFilter.backendLoginUserDTO().getUserId(), backendUpdatePwdDTO.getPassword(), backendUpdatePwdDTO.getNewPassword());
+        boolean flag = backendUserService.updatePassword(getBackendUserId(), backendUpdatePwdDTO.getPassword(), backendUpdatePwdDTO.getNewPassword());
         if (!flag) {
             throw new CustomizeException("原密码不正确");
         }
@@ -77,7 +76,7 @@ public class UserController extends BaseController {
             throw new CustomizeException("系统内置管理员不能删除");
         }
 
-        if (ArrayUtils.contains(userIds, AuthFilter.backendLoginUserDTO().getUserId())) {
+        if (ArrayUtils.contains(userIds, getBackendUserId())) {
             throw new CustomizeException("当前用户不能删除");
         }
         backendUserService.deleteByUserId(userIds);

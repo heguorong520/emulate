@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.emulate.database.config.MybatisPlusConfig
+
+

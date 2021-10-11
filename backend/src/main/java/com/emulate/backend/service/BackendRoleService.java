@@ -13,7 +13,7 @@ import com.emulate.backend.dao.BackendRoleDao;
 import com.emulate.backend.dto.BackendRoleDTO;
 import com.emulate.backend.dto.QueryRoleDTO;
 import com.emulate.backend.entity.BackendRoleEntity;
-import com.emulate.core.utils.PageData;
+import com.emulate.database.page.PageData;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

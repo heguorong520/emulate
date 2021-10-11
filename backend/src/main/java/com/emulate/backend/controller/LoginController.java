@@ -7,10 +7,8 @@ import com.emulate.core.controller.BaseController;
 import com.emulate.core.enums.HeaderKeyEnum;
 import com.emulate.core.enums.RedisCacheKeyEnum;
 import com.emulate.core.excetion.CustomizeException;
-import com.emulate.core.filter.AuthFilter;
 import com.emulate.core.result.ResultBody;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
-import com.sun.deploy.net.HttpUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -77,7 +75,8 @@ public class LoginController extends BaseController {
      */
     @GetMapping("login/info")
     public ResultBody<?> info() {
-        return ResultBody.ok(AuthFilter.backendLoginUserDTO());
+       // AuthFilter.backendLoginUserDTO()
+        return ResultBody.ok();
     }
 
 }

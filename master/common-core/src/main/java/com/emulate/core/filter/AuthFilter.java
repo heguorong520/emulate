@@ -1,3 +1,4 @@
+/*
 package com.emulate.core.filter;
 
 
@@ -20,9 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+*/
 /**
  * 权限过滤
- */
+ *//*
+
 @Slf4j
 public class AuthFilter extends BaseFilter {
 
@@ -89,22 +92,27 @@ public class AuthFilter extends BaseFilter {
     }
 
 
-    /**
+    */
+/**
      * 获取存储的登录用户
      *
      * @return
-     */
+     *//*
+
     public static LoginUserDTO backendLoginUserDTO() {
         return backendUser.get();
     }
 
-    /**
+    */
+/**
      * 获取存储的登录用户
      *
      * @return
-     */
+     *//*
+
     public static LoginUserDTO clientLoginUserDTO() {
         return clientUser.get();
     }
 
 }
+*/

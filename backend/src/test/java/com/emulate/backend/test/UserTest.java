@@ -8,7 +8,7 @@ import com.emulate.backend.dto.BackendUserDTO;
 import com.emulate.backend.dto.QueryUserDTO;
 import com.emulate.backend.entity.BackendUserEntity;
 import com.emulate.backend.service.BackendUserService;
-import com.emulate.core.utils.PageData;
+import com.emulate.database.page.PageData;
 import junit.framework.TestCase;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
