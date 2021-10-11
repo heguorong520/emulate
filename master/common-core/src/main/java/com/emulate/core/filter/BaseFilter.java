@@ -32,20 +32,5 @@ public class BaseFilter extends OncePerRequestFilter {
         response.getWriter().write(JSONObject.toJSONString(ResultBody.error(errorEnum)));
     }
 
-    /**
-     * 校验请求地址是否存在
-     * @param url
-     * @return
-     */
-    protected boolean verifyPath(String url, List<String> urlList){
-        Boolean result = false;
-        AntPathMatcher matcher= new AntPathMatcher();
-        for (String path :urlList){
-            if(matcher.match(path,url)){
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
+
 }

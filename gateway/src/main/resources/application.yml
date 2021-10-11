@@ -13,10 +13,6 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: service-user
-          uri: lb://service-user
-          predicates:
-            - Path=/uc/**
         - id:  service-backend
           uri: lb://service-backend
           predicates:

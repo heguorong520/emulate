@@ -1,105 +1,116 @@
-///*
-//package com.emulate.gateway.filter;
-//
-//import lombok.AllArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-//import org.springframework.cloud.gateway.filter.GlobalFilter;
-//import org.springframework.core.Ordered;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.server.reactive.ServerHttpResponse;
-//import org.springframework.stereotype.Component;
-//import org.springframework.web.server.ServerWebExchange;
-//import reactor.core.publisher.Mono;
-//
-//
-//*/
-///**
-// * 网关统一的token验证
-// *
-// * @author pangu
-// * @since 1.5.8
-// *//*
-//
-//@Slf4j
-//@Component
-//@AllArgsConstructor
-//public class TokenFilter implements GlobalFilter, Ordered {
-//
-//
-//	@Override
-//	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-//		// 如果未启用网关验证，则跳过
-//		if (!mateApiProperties.getEnable()) {
-//			return chain.filter(exchange);
-//		}
-//
-//		//　如果在忽略的url里，则跳过
-//		String path = replacePrefix(exchange.getRequest().getURI().getPath());
-//		String requestUrl = exchange.getRequest().getURI().getRawPath();
-//		if (ignore(path) || ignore(requestUrl)) {
-//			return chain.filter(exchange);
-//		}
-//
-//		// 验证token是否有效
-//		ServerHttpResponse resp = exchange.getResponse();
-//		String headerToken = exchange.getRequest().getHeaders().getFirst(Oauth2Constant.HEADER_TOKEN);
-//		if (headerToken == null) {
-//			return unauthorized(resp, "没有携带Token信息！");
-//		}
-//		String token = TokenUtil.getToken(headerToken);
-//		Claims claims = SecurityUtil.getClaims(token);
-//		if (claims == null) {
-//			return unauthorized(resp, "token已过期或验证不正确！");
-//		}
-//
-//		// 判断token是否存在于redis,对于只允许一台设备场景适用。
-//		// 如只允许一台设备登录，需要在登录成功后，查询key是否存在，如存在，则删除此key，提供思路。
-//		boolean hasKey = redisService.hasKey("auth:" + token);
-//		log.debug("查询token是否存在: " + hasKey);
-//		if (!hasKey) {
-//			return unauthorized(resp, "登录超时，请重新登录");
-//		}
-//		return chain.filter(exchange);
-//	}
-//
-//	*/
-///**
-//	 * 检查是否忽略url
-//	 * @param path 路径
-//	 * @return boolean
-//	 *//*
-//
-//	private boolean ignore(String path) {
-//		return mateApiProperties.getIgnoreUrl().stream()
-//				.map(url -> url.replace("/**", ""))
-//				.anyMatch(path::startsWith);
-//	}
-//
-//	*/
-///**
-//	 * 移除模块前缀
-//	 * @param path 路径
-//	 * @return String
-//	 *//*
-//
-//	private String replacePrefix(String path) {
-//		if (path.startsWith(PATH_PREFIX)) {
-//			return path.substring(path.indexOf(StringPool.SLASH, FROM_INDEX));
-//		}
-//		return path;
-//	}
-//
-//	private Mono<Void> unauthorized(ServerHttpResponse resp, String msg) {
-//		return ResponseUtil.webFluxResponseWriter(resp, MateConstant.JSON_UTF8, HttpStatus.UNAUTHORIZED, msg); }
-//
-//	@Override
-//	public int getOrder() {
-//		return MateConstant.MATE_UAA_FILTER_ORDER;
-//	}
-//
-//	public static void main(String[] args) {
-//
-//	}
-//}
-//*/
+package com.emulate.gateway.filter;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.emulate.core.enums.GlobalErrorEnum;
+import com.emulate.core.enums.HeaderKeyEnum;
+import com.emulate.core.enums.RedisCacheKeyEnum;
+import com.emulate.core.jwt.TokenUtil;
+import com.emulate.core.result.ResultBody;
+import com.emulate.core.user.LoginUserDTO;
+import com.emulate.core.yml.AuthSignYml;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.http.ResponseUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.server.HttpServerRequest;
+
+import java.util.List;
+
+
+@Slf4j
+@Component
+@AllArgsConstructor
+public class TokenFilter implements GlobalFilter, Ordered {
+	@Autowired
+	private RedisTemplate redisTemplate;
+
+	@Autowired
+	private AuthSignYml authSignYml;
+
+	private static final String URI = "/v2/api-docs";
+
+	public static final String JSON_UTF8 = "application/json;charset=UTF-8";
+
+
+	@Override
+	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+		log.info(exchange.getRequest().getPath().contextPath().value());
+		String path = exchange.getRequest().getURI().getPath();
+		if (StringUtils.endsWithIgnoreCase(path,URI )) {
+			return chain.filter(exchange);
+		}
+		if(path.contains("/rpc")){
+			return chain.filter(exchange);
+		}
+		if(path.contains("/api")){
+			String module = path.substring(0,path.indexOf("/api"));
+			path = path.replace("/api","").replace(module,"");
+		}
+		String token = exchange.getRequest().getHeaders().getFirst(HeaderKeyEnum.AUTHORIZATION.getName());
+		String clientType = exchange.getRequest().getHeaders().getFirst(HeaderKeyEnum.CLIENT_TYPE.getName());
+		if (ObjectUtil.isNotEmpty(token)) {
+			String userJson;
+			if ("backend".equals(clientType)) {
+				userJson = TokenUtil.verifyTokenBackend(token);
+			} else {
+				userJson = TokenUtil.verifyTokenClient(token);
+			}
+			if (userJson == null) {
+				return webFluxResponseWriter(exchange.getResponse(),GlobalErrorEnum.无权访问);
+			}
+			ServerHttpRequest newRequest = exchange.getRequest().mutate().header("user",userJson).build();
+			return chain.filter(exchange.mutate().request(newRequest).build());
+		}
+		if (!authSignYml.getEnableAuth() || verifyPath(path, authSignYml.getNoAuthList())) {
+			return chain.filter(exchange);
+		}
+		return webFluxResponseWriter(exchange.getResponse(),GlobalErrorEnum.无权访问);
+	}
+
+	@Override
+	public int getOrder() {
+			return -200;
+	}
+
+
+	public static Mono<Void> webFluxResponseWriter(ServerHttpResponse response,GlobalErrorEnum globalErrorEnum) {
+		response.setStatusCode(HttpStatus.valueOf(globalErrorEnum.getCode()));
+		response.getHeaders().add(HttpHeaders.CONTENT_TYPE, JSON_UTF8);
+		ResultBody<?> result = ResultBody.error(globalErrorEnum);
+		DataBuffer dataBuffer = response.bufferFactory().wrap(JSONObject.toJSONString(result).getBytes());
+		return response.writeWith(Mono.just(dataBuffer));
+	}
+
+	/**
+	 * 校验请求地址是否存在
+	 * @param url
+	 * @return
+	 */
+	protected boolean verifyPath(String url, List<String> urlList){
+		Boolean result = false;
+		AntPathMatcher matcher= new AntPathMatcher();
+		for (String path :urlList){
+			if(matcher.match(path,url)){
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+}
