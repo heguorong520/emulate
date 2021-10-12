@@ -54,6 +54,7 @@ public class TokenFilter implements GlobalFilter, Ordered {
         return FilterCommonUtil.webFluxResponseWriter(exchange.getResponse(), GlobalErrorEnum.无权访问);
     }
 
+    //值越小越先执行
     @Override
     public int getOrder() {
         return -200;
