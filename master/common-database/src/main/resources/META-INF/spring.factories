@@ -1,4 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.emulate.database.config.MybatisPlusConfig
-
-
+  com.emulate.database.config.MybatisPlusConfig,\
+  com.emulate.database.sharding.MyMasterSlaveDatasourceInitializationProcess
