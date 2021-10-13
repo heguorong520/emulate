@@ -1,6 +1,9 @@
 package com.emulate.redis.config;
 
 import com.emulate.redis.serializer.FastJsonRedisSerializer;
+import com.emulate.redis.service.RedisService;
+import com.emulate.redis.util.RedisLockUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,5 +30,16 @@ public class RedisConfig {
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setConnectionFactory(redisConnectionFactory);
         return template;
+    }
+    @Bean
+    @ConditionalOnBean(name = "redisTemplate")
+    public RedisService redisService() {
+        return new RedisService();
+    }
+
+    @Bean
+    @ConditionalOnBean(name = "redisTemplate")
+    public RedisLockUtil redisLockUtil(RedisTemplate redisTemplate) {
+        return new RedisLockUtil(redisTemplate);
     }
 }
