@@ -10,10 +10,11 @@ import com.emulate.backend.dto.QueryUserDTO;
 import com.emulate.backend.entity.BackendUserEntity;
 import com.emulate.backend.service.BackendUserRoleService;
 import com.emulate.backend.service.BackendUserService;
-import com.emulate.core.controller.BaseController;
+import com.emulate.core.controller.BaseApiController;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.result.ResultBody;
 import com.emulate.database.page.PageData;
+import com.emulate.permissions.util.PermissionsUserUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ import java.util.List;
  * 系统用户
  */
 @RestController
-public class UserController extends BaseController {
+public class UserController extends BaseApiController {
     @Autowired
     private BackendUserService backendUserService;
     @Autowired
@@ -41,9 +42,9 @@ public class UserController extends BaseController {
 
 
     @PostMapping("user/password")
-    public ResultBody<?> password(@RequestBody @Valid BackendUpdatePwdDTO backendUpdatePwdDTO) throws Exception {
+    public ResultBody<?> password(@RequestBody @Valid BackendUpdatePwdDTO backendUpdatePwdDTO) {
         //更新密码
-        boolean flag = backendUserService.updatePassword(getBackendUserId(), backendUpdatePwdDTO.getPassword(), backendUpdatePwdDTO.getNewPassword());
+        boolean flag = backendUserService.updatePassword(PermissionsUserUtil.getUserId(), backendUpdatePwdDTO.getPassword(), backendUpdatePwdDTO.getNewPassword());
         if (!flag) {
             throw new CustomizeException("原密码不正确");
         }
@@ -63,7 +64,7 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("user/save")
-    public ResultBody<?> save(@Valid @RequestBody BackendUserDTO user) throws Exception {
+    public ResultBody<?> save(@Valid @RequestBody BackendUserDTO user) {
 
         backendUserService.saveUser(user);
 
@@ -76,7 +77,7 @@ public class UserController extends BaseController {
             throw new CustomizeException("系统内置管理员不能删除");
         }
 
-        if (ArrayUtils.contains(userIds, getBackendUserId())) {
+        if (ArrayUtils.contains(userIds, PermissionsUserUtil.getUserId())) {
             throw new CustomizeException("当前用户不能删除");
         }
         backendUserService.deleteByUserId(userIds);

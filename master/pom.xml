@@ -17,6 +17,7 @@
         <module>common-redis</module>
         <module>common-database</module>
         <module>common-swagger</module>
+        <module>common-permissions</module>
     </modules>
     <build>
         <plugins>

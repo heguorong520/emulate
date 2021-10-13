@@ -19,18 +19,17 @@ import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.enums.RedisCacheKeyEnum;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.jwt.TokenUtil;
-import com.emulate.core.user.LoginUserDTO;
 import com.emulate.core.utils.AESUtil;
 import com.emulate.database.page.PageData;
+import com.emulate.permissions.util.PermissionsUserUtil;
+import com.emulate.redis.service.RedisService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -39,7 +38,7 @@ import java.util.stream.Collectors;
 public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserEntity> {
 
     @Resource
-    private RedisTemplate redisTemplate;
+    private RedisService redisService;
 
     @Resource
     private BackendUserRoleService backendUserRoleService;
@@ -106,7 +105,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
 
 
     @Transactional
-    public boolean updatePassword(Long userId, String password, String newPassword) throws Exception {
+    public boolean updatePassword(Long userId, String password, String newPassword) {
         BackendUserEntity userEntity = new BackendUserEntity();
         userEntity.setPassword(AESUtil.encrypt(newPassword, AESUtil.PASSWORD_KEY));
         String aesPwd = AESUtil.encrypt(password, AESUtil.PASSWORD_KEY);
@@ -123,9 +122,8 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
      * 登录
      *
      * @param backendLoginDTO
-     * @throws Exception
      */
-    public BackendLoginResultDTO login(@Valid BackendLoginDTO backendLoginDTO) throws Exception {
+    public BackendLoginResultDTO login(@Valid BackendLoginDTO backendLoginDTO) {
         QueryWrapper<BackendUserEntity> userEntityQueryWrapper = new QueryWrapper<>();
         userEntityQueryWrapper.eq("username", backendLoginDTO.getUsername());
         BackendUserEntity backendUserEntity = this.baseMapper.selectOne(userEntityQueryWrapper);
@@ -137,7 +135,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
             throw new CustomizeException(GlobalErrorEnum.密码错误);
         }
         String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + backendUserEntity.getUserId();
-        String token = (String) redisTemplate.opsForValue().get(tokenCacheKey);
+        String token = (String) redisService.get(tokenCacheKey);
 
         if (token == null) {
             Map<String, Object> userInfo = new HashMap<>();
@@ -145,7 +143,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
             userInfo.put("userId", backendUserEntity.getUserId());
             token = TokenUtil.createTokenBackend(JSONObject.toJSONString(userInfo));
             //保存TOKEN在缓存中做登录权限进行对比
-            redisTemplate.opsForValue().set(tokenCacheKey, token, RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheTime(), TimeUnit.SECONDS);
+            redisService.set(tokenCacheKey, token, RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheTime());
         }
 
         BackendLoginResultDTO resultDTO = new BackendLoginResultDTO();
@@ -160,13 +158,13 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
      * 注销
      */
     public void logout() {
-        LoginUserDTO userDTO = null;//AuthFilter.backendLoginUserDTO();
-        if (userDTO == null) {
+
+        if (PermissionsUserUtil.getUserDetail() == null) {
             throw new CustomizeException(GlobalErrorEnum.无权访问);
         }
         //清理缓存中的TOKEN即可
-        String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + userDTO.getUserId();
-        redisTemplate.delete(tokenCacheKey);
+        String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + PermissionsUserUtil.getUserId();
+        redisService.del(tokenCacheKey);
     }
 
     @Transactional

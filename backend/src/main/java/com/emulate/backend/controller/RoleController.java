@@ -7,7 +7,7 @@ import com.emulate.backend.dto.QueryRoleDTO;
 import com.emulate.backend.entity.BackendRoleEntity;
 import com.emulate.backend.service.BackendRoleMenuService;
 import com.emulate.backend.service.BackendRoleService;
-import com.emulate.core.controller.BaseController;
+import com.emulate.core.controller.BaseApiController;
 import com.emulate.core.result.ResultBody;
 import com.emulate.database.page.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.util.List;
  * @author Mark sunlightcs@gmail.com
  */
 @RestController
-public class RoleController extends BaseController {
+public class RoleController extends BaseApiController {
     @Autowired
     private BackendRoleService backendRoleService;
     @Autowired

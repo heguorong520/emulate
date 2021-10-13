@@ -1,16 +1,13 @@
-package com.emulate.core.annotation;
+package com.emulate.permissions.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * @author hgr
- */
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ShiroValidate {
-    //接口校验参数
+public @interface Permissions {
     String perms() default "";
 }

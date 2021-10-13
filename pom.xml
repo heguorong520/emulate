@@ -30,7 +30,6 @@
 		<dependency>
 			<groupId>cn.hutool</groupId>
 			<artifactId>hutool-core</artifactId>
-			<version>5.7.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -87,6 +86,11 @@
 			</dependency>
 			<dependency>
 				<groupId>com.emulate</groupId>
+				<artifactId>common-permissions</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.emulate</groupId>
 				<artifactId>common-core</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
@@ -126,8 +130,12 @@
 				<artifactId>logstash-logback-encoder</artifactId>
 				<version>${net.logstash.logback.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>cn.hutool</groupId>
+				<artifactId>hutool-core</artifactId>
+				<version>${cn.hutool.version}</version>
+			</dependency>
 		</dependencies>
-
 	</dependencyManagement>
 	<distributionManagement>
 		<repository>

@@ -8,16 +8,16 @@
 
 package com.emulate.backend.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.emulate.backend.dto.BackendMenuNavDTO;
 import com.emulate.backend.emums.MenuTypeEnum;
 import com.emulate.backend.entity.BackendMenuEntity;
 import com.emulate.backend.service.BackendMenuService;
-import com.emulate.core.controller.BaseController;
+import com.emulate.core.controller.BaseApiController;
 import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.result.ResultBody;
 
+import com.emulate.permissions.util.PermissionsUserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,13 +31,13 @@ import java.util.Objects;
  * 系统菜单
  */
 @RestController
-public class MenuController extends BaseController {
+public class MenuController extends BaseApiController {
     @Autowired
     private BackendMenuService backendMenuService;
 
     @GetMapping("menu/nav")
     public ResultBody<BackendMenuNavDTO> nav() {
-        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(getBackendUserId());
+        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(PermissionsUserUtil.getUserId());
         return ResultBody.ok(menuList);
     }
 
@@ -49,7 +49,7 @@ public class MenuController extends BaseController {
 
     @GetMapping("menu/role/select")
     public ResultBody<List<BackendMenuNavDTO>> roleSelect() {
-        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(getBackendUserId());
+        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(PermissionsUserUtil.getUserId());
         return ResultBody.ok(menuList);
     }
 

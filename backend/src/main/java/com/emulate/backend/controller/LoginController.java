@@ -3,7 +3,7 @@ package com.emulate.backend.controller;
 import com.emulate.backend.dto.BackendLoginDTO;
 import com.emulate.backend.dto.BackendLoginResultDTO;
 import com.emulate.backend.service.BackendUserService;
-import com.emulate.core.controller.BaseController;
+import com.emulate.core.controller.BaseApiController;
 import com.emulate.core.enums.HeaderKeyEnum;
 import com.emulate.core.enums.RedisCacheKeyEnum;
 import com.emulate.core.excetion.CustomizeException;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @Api(tags = "登录模块")
-public class LoginController extends BaseController {
+public class LoginController extends BaseApiController {
     @Resource
     private BackendUserService backendUserService;
 
