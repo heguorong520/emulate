@@ -25,12 +25,14 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class RedisService {
 
-	@Autowired(required = false)
-	@SuppressWarnings("all")
 	private RedisTemplate<String, Object> redisTemplate;
 
-	@Autowired(required = false)
 	private RedisLockUtil redisLockUtil;
+
+	public RedisService(RedisTemplate redisTemplate,RedisLockUtil redisLockUtil) {
+		this.redisTemplate = redisTemplate;
+		this.redisLockUtil = redisLockUtil;
+	}
 
 	/**
 	 * 指定缓存失效时间

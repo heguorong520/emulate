@@ -9,6 +9,7 @@ import com.emulate.core.enums.HeaderKeyEnum;
 import com.emulate.core.utils.AESUtil;
 import com.emulate.core.yml.AuthSignYml;
 import com.emulate.gateway.util.FilterCommonUtil;
+import com.emulate.redis.service.RedisService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 public class SignFilter implements GlobalFilter, Ordered {
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisService redisService;
 
     @Autowired
     private AuthSignYml authSignYml;
@@ -69,7 +70,7 @@ public class SignFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -300;
+        return -100;
     }
 
 
@@ -82,7 +83,8 @@ public class SignFilter implements GlobalFilter, Ordered {
      */
     public TreeMap<String, Object> getRequestParams(ServerWebExchange exchange, TreeMap<String, Object> paramMap) {
         //get请求参数
-        Map parmas = exchange.getRequest().getQueryParams();
+        Map<String,String> parmas = exchange.getRequest().getQueryParams().toSingleValueMap();
+
         if (parmas != null) {
             paramMap.putAll(parmas);
         }
@@ -115,20 +117,18 @@ public class SignFilter implements GlobalFilter, Ordered {
         String random = (String) paramMap.get(HeaderKeyEnum.RANDOM.getName());
         String timeStr = (String) paramMap.get(HeaderKeyEnum.TIME.getName());
         // 服务端加签密文 = 加签方法(私钥+参数生产);
-        String redisRandom = (String) redisTemplate.opsForValue().get(random);
+        String redisRandom = (String) redisService.get(random);
         if (null != redisRandom) {
             log.info("RANDOM:{},在5分中内使用过", random);
             return false;
         }
-
-        redisTemplate.opsForValue().set(random, random, 5, TimeUnit.MINUTES);
         //时间搓
         Long time = Long.valueOf(timeStr) + 60L * 1000L;
         if (System.currentTimeMillis() >= time) {
             log.info("time:{},请求发起时间超过一分钟");
             return false;
         }
-        redisTemplate.opsForValue().set(random, random);
+        redisService.set(random, random, 5L*60);
         //签名校验
         StringBuffer stringBuffer = new StringBuffer();
         paramMap.entrySet().stream()

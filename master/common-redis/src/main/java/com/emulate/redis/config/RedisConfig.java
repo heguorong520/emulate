@@ -31,10 +31,11 @@ public class RedisConfig {
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }
+
     @Bean
     @ConditionalOnBean(name = "redisTemplate")
-    public RedisService redisService() {
-        return new RedisService();
+    public RedisService redisService(RedisTemplate redisTemplate,RedisLockUtil redisLockUtil) {
+        return new RedisService(redisTemplate,redisLockUtil);
     }
 
     @Bean

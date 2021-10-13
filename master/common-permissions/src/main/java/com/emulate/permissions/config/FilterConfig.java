@@ -24,7 +24,6 @@ import java.util.Map;
 @Slf4j
 @Configuration
 @ComponentScan(value = "com.emulate.permissions")
-@ConditionalOnBean(value = {RedisService.class})
 public class FilterConfig {
 
     @SuppressWarnings("all")
