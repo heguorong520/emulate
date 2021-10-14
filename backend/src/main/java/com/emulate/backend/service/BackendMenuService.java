@@ -8,10 +8,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.emulate.backend.dao.BackendMenuDao;
-import com.emulate.backend.dto.BackendMenuNavDTO;
+import com.emulate.backend.dto.BackendMenuDTO;
 import com.emulate.backend.emums.MenuTypeEnum;
 import com.emulate.backend.entity.BackendMenuEntity;
 import com.emulate.backend.entity.BackendRoleMenuEntity;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,27 +34,24 @@ public class BackendMenuService extends ServiceImpl<BackendMenuDao, BackendMenuE
     @Autowired
     private BackendRoleMenuService backendRoleMenuService;
 
-    @Autowired
-    private BackendUserRoleService backendUserRoleService;
-
 
     public List<BackendMenuEntity> findListParentId(Long parentId) {
         return baseMapper.queryListParentId(parentId);
     }
 
-    public List<BackendMenuNavDTO> findNotButtonList() {
+    public List<BackendMenuDTO> findNotButtonList() {
         List<BackendMenuEntity> list = baseMapper.queryNotButtonList();
         return menuDeal(list);
     }
 
-    public List<BackendMenuNavDTO> findUserMenuList(Long userId) {
+    public List<BackendMenuDTO> findUserMenuAndButtonList(Long userId) {
         //系统管理员，拥有最高权限
         if (userId == 1) {
-            return findMenuNav(null);
+            return findMenu(null, Boolean.TRUE);
         }
         //用户菜单列表
         List<Long> menuIdList = backendUserService.queryAllMenuId(userId);
-        return findMenuNav(menuIdList);
+        return findMenu(menuIdList,Boolean.TRUE);
     }
 
     public void delete(Long menuId) {
@@ -64,17 +62,17 @@ public class BackendMenuService extends ServiceImpl<BackendMenuDao, BackendMenuE
     }
 
 
-    private List<BackendMenuNavDTO> findMenuNav(List<Long> menuIdList) {
-        return menuDeal(findByAllOrMenuIds(menuIdList));
+    private List<BackendMenuDTO> findMenu(List<Long> menuIdList,Boolean isNotButton) {
+        return menuDeal(findByAllOrMenuIds(menuIdList,isNotButton));
     }
 
-    private List<BackendMenuNavDTO> toNavList(List<BackendMenuEntity> menuList) {
-        List<BackendMenuNavDTO> navList = new ArrayList<>();
+    private List<BackendMenuDTO> toNavList(List<BackendMenuEntity> menuList) {
+        List<BackendMenuDTO> navList = new ArrayList<>();
         if (ObjectUtil.isEmpty(menuList)) {
             return navList;
         }
         for (BackendMenuEntity entity : menuList) {
-            BackendMenuNavDTO navDTO = BeanUtil.toBean(entity, BackendMenuNavDTO.class);
+            BackendMenuDTO navDTO = BeanUtil.toBean(entity, BackendMenuDTO.class);
             navDTO.setHref(entity.getUrl());
             navDTO.setTitle(entity.getName());
             navList.add(navDTO);
@@ -82,8 +80,8 @@ public class BackendMenuService extends ServiceImpl<BackendMenuDao, BackendMenuE
         return navList;
     }
 
-    private void menuTreeList(List<BackendMenuNavDTO> navList, List<BackendMenuEntity> menuList) {
-        for (BackendMenuNavDTO navDTO : navList) {
+    private void menuTreeList(List<BackendMenuDTO> navList, List<BackendMenuEntity> menuList) {
+        for (BackendMenuDTO navDTO : navList) {
             List<BackendMenuEntity> list = menuList.stream().
                     filter(e -> e.getParentId().equals(navDTO.getMenuId())).
                     collect(Collectors.toList());
@@ -98,19 +96,18 @@ public class BackendMenuService extends ServiceImpl<BackendMenuDao, BackendMenuE
     }
 
 
-    private List<BackendMenuNavDTO> menuDeal(List<BackendMenuEntity> list) {
+    private List<BackendMenuDTO> menuDeal(List<BackendMenuEntity> list) {
         //查询根菜单列表
         List<BackendMenuEntity> parentList = list.stream().
                 filter(e -> e.getParentId().intValue() == MenuTypeEnum.目录.getValue()).
                 collect(Collectors.toList());
 
-
         List<BackendMenuEntity> menuList = list.stream().
-                filter(e -> e.getType().intValue() == MenuTypeEnum.菜单.getValue()).
+                filter(e -> e.getType().intValue() == MenuTypeEnum.菜单.getValue() || e.getType().intValue() == MenuTypeEnum.按钮.getValue()).
                 collect(Collectors.toList());
 
         //转换
-        List<BackendMenuNavDTO> navList = toNavList(parentList);
+        List<BackendMenuDTO> navList = toNavList(parentList);
         //递归获取子菜单
         menuTreeList(navList, menuList);
 
@@ -136,12 +133,20 @@ public class BackendMenuService extends ServiceImpl<BackendMenuDao, BackendMenuE
         return result;
     }
 
-	public List<BackendMenuEntity> findByAllOrMenuIds(List<Long> menuIdList){
-		QueryWrapper<BackendMenuEntity> queryWrapper = new QueryWrapper<>();
-		if (ObjectUtil.isNotEmpty(menuIdList)) {
-			queryWrapper.in("menuId", menuIdList);
-		}
-		List<BackendMenuEntity> list = baseMapper.selectList(queryWrapper);
-		return list;
-	}
+    public List<BackendMenuEntity> findByAllOrMenuIds(List<Long> menuIdList,boolean isNotButton) {
+        QueryWrapper<BackendMenuEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in(ObjectUtil.isNotEmpty(menuIdList),"menu_id", menuIdList);
+        queryWrapper.in(!isNotButton,"type",0,1);
+        return baseMapper.selectList(queryWrapper);
+    }
+
+    public List<BackendMenuDTO> findUserMenuNav(Long userId) {
+        //系统管理员，拥有最高权限
+        if (userId == 1) {
+            return findMenu(null, Boolean.FALSE);
+        }
+        //用户菜单列表
+        List<Long> menuIdList = backendUserService.queryAllMenuId(userId);
+        return findMenu(menuIdList,Boolean.FALSE);
+    }
 }

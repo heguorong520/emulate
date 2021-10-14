@@ -84,7 +84,6 @@ public class SignFilter implements GlobalFilter, Ordered {
     public TreeMap<String, Object> getRequestParams(ServerWebExchange exchange, TreeMap<String, Object> paramMap) {
         //get请求参数
         Map<String,String> parmas = exchange.getRequest().getQueryParams().toSingleValueMap();
-
         if (parmas != null) {
             paramMap.putAll(parmas);
         }

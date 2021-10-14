@@ -48,13 +48,14 @@ public class LoginController extends BaseApiController {
         return ResultBody.ok(backendUserService.login(loginDTO));
     }
 
-    @ApiOperation("登出接口")
+    @ApiOperation("退出登录")
     @PostMapping("/logout")
     public ResultBody<?> logout(){
         backendUserService.logout();
         return ResultBody.ok();
     }
 
+    @ApiOperation("验证码")
     @GetMapping("sa/captcha.jpg")
     public void captcha(String deviceId,HttpServletResponse response, HttpServletRequest request)throws IOException {
         response.setHeader("Cache-Control", "no-store, no-cache");

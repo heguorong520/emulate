@@ -145,12 +145,12 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
             //保存TOKEN在缓存中做登录权限进行对比
             redisService.set(tokenCacheKey, token, RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheTime());
         }
-
         BackendLoginResultDTO resultDTO = new BackendLoginResultDTO();
         resultDTO.setUserId(backendUserEntity.getUserId());
         resultDTO.setUsername(backendUserEntity.getUsername());
         resultDTO.setToken(token);
         resultDTO.setPerms(findUserPerms(backendUserEntity.getUserId()));
+        redisService.set(RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheKey(), RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheTime());
         return resultDTO;
     }
 

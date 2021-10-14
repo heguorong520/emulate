@@ -5,6 +5,7 @@ package com.emulate.backend.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.emulate.backend.entity.BackendUserEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -25,6 +26,6 @@ public interface BackendUserDao extends BaseMapper<BackendUserEntity> {
 	/**
 	 * 查询用户的所有菜单ID
 	 */
-	List<Long> queryAllMenuId(Long userId);
+	List<Long> queryAllMenuId(@Param("userId") Long userId);
 
 }

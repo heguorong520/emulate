@@ -34,7 +34,7 @@ public class PermissionsFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        String path = request.getServletPath().replace("/api", "");
+        String path = request.getServletPath().replace("/api/", "");
         path = path.replace("/", ":");
         //获取gateway向下游传递的用户信息--gateway验证token
         String userJson = request.getHeader("user");

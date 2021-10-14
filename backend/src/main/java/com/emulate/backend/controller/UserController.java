@@ -7,25 +7,27 @@ import com.emulate.backend.dto.BackendUpdatePwdDTO;
 import com.emulate.backend.dto.BackendUserDTO;
 import com.emulate.backend.dto.BackendUserStatusDTO;
 import com.emulate.backend.dto.QueryUserDTO;
-import com.emulate.backend.entity.BackendUserEntity;
 import com.emulate.backend.service.BackendUserRoleService;
 import com.emulate.backend.service.BackendUserService;
 import com.emulate.core.controller.BaseApiController;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.result.ResultBody;
 import com.emulate.database.page.PageData;
+import com.emulate.permissions.annotation.Permissions;
 import com.emulate.permissions.util.PermissionsUserUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import java.util.List;
 
 /**
  * 系统用户
  */
+@Api("用户管理员")
 @RestController
 public class UserController extends BaseApiController {
     @Autowired
@@ -33,6 +35,8 @@ public class UserController extends BaseApiController {
     @Autowired
     private BackendUserRoleService backendUserRoleService;
 
+    @ApiOperation("用户列表")
+    @Permissions(perms="user:password")
     @GetMapping("user/list")
     public ResultBody<?> list(@ModelAttribute QueryUserDTO queryUserDTO) {
         PageData page = backendUserService.findPage(queryUserDTO);
@@ -40,7 +44,8 @@ public class UserController extends BaseApiController {
         return ResultBody.ok(page);
     }
 
-
+    @Permissions(perms="user:password")
+    @ApiOperation("修改密码")
     @PostMapping("user/password")
     public ResultBody<?> password(@RequestBody @Valid BackendUpdatePwdDTO backendUpdatePwdDTO) {
         //更新密码
@@ -52,17 +57,8 @@ public class UserController extends BaseApiController {
         return ResultBody.ok();
     }
 
-    @GetMapping("user/info")
-    public ResultBody<?> info(Long userId) {
-        BackendUserEntity user = backendUserService.getById(userId);
-
-        //获取用户所属的角色列表
-        List<Long> roleIdList = backendUserRoleService.findRoleIdList(userId);
-        user.setRoleIdList(roleIdList);
-
-        return ResultBody.ok(user);
-    }
-
+    @Permissions(perms="user:save")
+    @ApiOperation("保存用户")
     @PostMapping("user/save")
     public ResultBody<?> save(@Valid @RequestBody BackendUserDTO user) {
 
@@ -71,6 +67,8 @@ public class UserController extends BaseApiController {
         return ResultBody.ok();
     }
 
+    @Permissions(perms="user:save")
+    @ApiOperation("删除用户")
     @PostMapping("user/delete")
     public ResultBody<?> delete(@RequestBody Long[] userIds) {
         if (ArrayUtils.contains(userIds, 1L)) {

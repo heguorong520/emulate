@@ -8,7 +8,7 @@
 
 package com.emulate.backend.controller;
 
-import com.emulate.backend.dto.BackendMenuNavDTO;
+import com.emulate.backend.dto.BackendMenuDTO;
 import com.emulate.backend.emums.MenuTypeEnum;
 import com.emulate.backend.entity.BackendMenuEntity;
 import com.emulate.backend.service.BackendMenuService;
@@ -17,7 +17,10 @@ import com.emulate.core.enums.GlobalErrorEnum;
 import com.emulate.core.excetion.CustomizeException;
 import com.emulate.core.result.ResultBody;
 
+import com.emulate.permissions.annotation.Permissions;
 import com.emulate.permissions.util.PermissionsUserUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,83 +33,65 @@ import java.util.Objects;
 /**
  * 系统菜单
  */
+@Api(tags = "菜单模块")
 @RestController
 public class MenuController extends BaseApiController {
+
     @Autowired
     private BackendMenuService backendMenuService;
 
+    @ApiOperation("导航菜单")
     @GetMapping("menu/nav")
-    public ResultBody<BackendMenuNavDTO> nav() {
-        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(PermissionsUserUtil.getUserId());
+    public ResultBody<BackendMenuDTO> nav() {
+        List<BackendMenuDTO> menuList = backendMenuService.findUserMenuNav(PermissionsUserUtil.getUserId());
         return ResultBody.ok(menuList);
     }
 
+    @ApiOperation("菜单列表")
+    @Permissions(perms = "menu:list")
     @GetMapping("menu/list")
     public ResultBody<List<BackendMenuEntity>> list() {
         List<BackendMenuEntity> menuList = backendMenuService.list(null);
         return ResultBody.ok(menuList);
     }
 
+    @ApiOperation("角色分配菜单")
+    @Permissions(perms = "menu:role:select")
     @GetMapping("menu/role/select")
-    public ResultBody<List<BackendMenuNavDTO>> roleSelect() {
-        List<BackendMenuNavDTO> menuList = backendMenuService.findUserMenuList(PermissionsUserUtil.getUserId());
+    public ResultBody<List<BackendMenuDTO>> roleSelect() {
+        List<BackendMenuDTO> menuList = backendMenuService.findUserMenuAndButtonList(PermissionsUserUtil.getUserId());
         return ResultBody.ok(menuList);
     }
 
-    /**
-     * 选择菜单(添加、修改菜单)
-     */
+    @ApiOperation("上级菜单")
+    @Permissions(perms = "menu:select")
     @GetMapping("menu/select")
-    public ResultBody<List<BackendMenuNavDTO>> select() {
+    public ResultBody<List<BackendMenuDTO>> select() {
         //查询列表数据
-        List<BackendMenuNavDTO> menuList = backendMenuService.findNotButtonList();
+        List<BackendMenuDTO> menuList = backendMenuService.findNotButtonList();
         //添加顶级菜单
-        BackendMenuNavDTO root = new BackendMenuNavDTO();
+        BackendMenuDTO root = new BackendMenuDTO();
         root.setMenuId(0L);
         root.setName("目录上级");
         root.setParentId(0L);
         root.setChild(menuList);
-        List<BackendMenuNavDTO> result = new ArrayList<>();
+        List<BackendMenuDTO> result = new ArrayList<>();
         result.add(root);
         return ResultBody.ok(result);
     }
 
-    /**
-     * 菜单信息
-     */
-    @GetMapping("menu/info")
-    public ResultBody<BackendMenuEntity> info(Long menuId) {
-		BackendMenuEntity menu = backendMenuService.getById(menuId);
-        return ResultBody.ok(menu);
-    }
-
-    /**
-     * 保存
-     */
+    @Permissions(perms = "menu:save")
+    @ApiOperation("保存菜单")
     @PostMapping("menu/save")
     public ResultBody<?> save(@Valid  @RequestBody BackendMenuEntity menu) {
         verifyForm(menu);
-
         backendMenuService.saveOrUpdate(menu);
-
         return ResultBody.ok();
     }
 
-    /**
-     * 修改
-     */
-    @PostMapping("menu/update")
-    public ResultBody<?> update(@Valid @RequestBody BackendMenuEntity menu) {
-        verifyForm(menu);
 
-        backendMenuService.updateById(menu);
-
-        return ResultBody.ok();
-    }
-
-    /**
-     * 删除
-     */
+    @Permissions(perms = "menu:delete")
+    @ApiOperation("删除菜单")
     @GetMapping("menu/delete")
     public ResultBody<?> delete(Long id) {
         if (id <= 31) {

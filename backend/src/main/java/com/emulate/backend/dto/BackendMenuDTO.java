@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Data
-public class BackendMenuNavDTO implements Serializable {
+public class BackendMenuDTO implements Serializable {
 
     public String target;
 
@@ -23,11 +23,11 @@ public class BackendMenuNavDTO implements Serializable {
 
     public Long parentId;
 
-    public List<BackendMenuNavDTO> child;
+    public List<BackendMenuDTO> child;
 
     public Long menuId;
 
-    public List<BackendMenuNavDTO> getChild() {
+    public List<BackendMenuDTO> getChild() {
         if(child == null)
         return Collections.emptyList();
         return child;
