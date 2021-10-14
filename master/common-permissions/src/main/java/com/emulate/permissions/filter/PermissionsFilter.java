@@ -57,7 +57,7 @@ public class PermissionsFilter extends OncePerRequestFilter {
         }
         //判断用户是否拥有对应的权限
         List<String> userPermsList = (List<String>) redisService.get(USER_PERMS_CACHE_KEY + userDetail.getUserId());
-        if (userPermsList != null && !userPermsList.contains(path)) {
+        if (userPermsList == null || !userPermsList.contains(path)) {
             this.writeError(response);
             return;
         }
