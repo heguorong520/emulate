@@ -151,7 +151,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         resultDTO.setUsername(backendUserEntity.getUsername());
         resultDTO.setToken(token);
         resultDTO.setPerms(findUserPerms(backendUserEntity.getUserId()));
-        redisService.set(permsCacheKey, RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheTime());
+        redisService.set(permsCacheKey,resultDTO.getPerms(),RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheTime());
         return resultDTO;
     }
 

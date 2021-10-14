@@ -36,7 +36,7 @@ public class UserController extends BaseApiController {
     private BackendUserRoleService backendUserRoleService;
 
     @ApiOperation("用户列表")
-    @Permissions(perms="user:password")
+    @Permissions(perms="user:list")
     @GetMapping("user/list")
     public ResultBody<?> list(@ModelAttribute QueryUserDTO queryUserDTO) {
         PageData page = backendUserService.findPage(queryUserDTO);
