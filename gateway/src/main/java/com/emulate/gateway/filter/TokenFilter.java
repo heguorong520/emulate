@@ -43,7 +43,7 @@ public class TokenFilter implements GlobalFilter, Ordered {
                 userJson = TokenUtil.verifyTokenClient(token);
             }
             if (userJson == null) {
-                return FilterCommonUtil.webFluxResponseWriter(exchange.getResponse(), GlobalErrorEnum.无权访问);
+                return FilterCommonUtil.webFluxResponseWriter(exchange.getResponse(), GlobalErrorEnum.登录失效);
             }
             ServerHttpRequest newRequest = exchange.getRequest().mutate().header("user", userJson).build();
             return chain.filter(exchange.mutate().request(newRequest).build());
@@ -51,7 +51,7 @@ public class TokenFilter implements GlobalFilter, Ordered {
         if (!authSignYml.getEnableAuth() || FilterCommonUtil.verifyPath(path, authSignYml.getNoAuthList())) {
             return chain.filter(exchange);
         }
-        return FilterCommonUtil.webFluxResponseWriter(exchange.getResponse(), GlobalErrorEnum.无权访问);
+        return FilterCommonUtil.webFluxResponseWriter(exchange.getResponse(), GlobalErrorEnum.登录失效);
     }
 
     //值越小越先执行

@@ -135,6 +135,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
             throw new CustomizeException(GlobalErrorEnum.密码错误);
         }
         String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + backendUserEntity.getUserId();
+        String permsCacheKey = RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheKey() + backendUserEntity.getUserId();
         String token = (String) redisService.get(tokenCacheKey);
 
         if (token == null) {
@@ -150,7 +151,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         resultDTO.setUsername(backendUserEntity.getUsername());
         resultDTO.setToken(token);
         resultDTO.setPerms(findUserPerms(backendUserEntity.getUserId()));
-        redisService.set(RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheKey(), RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheTime());
+        redisService.set(permsCacheKey, RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheTime());
         return resultDTO;
     }
 
