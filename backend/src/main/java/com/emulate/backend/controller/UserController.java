@@ -81,7 +81,8 @@ public class UserController extends BaseApiController {
         backendUserService.deleteByUserId(userIds);
         return ResultBody.ok();
     }
-
+    @ApiOperation("禁用启用")
+    @Permissions(perms="user:status")
     @PostMapping("user/status")
     public ResultBody<?> status(@Valid @RequestBody BackendUserStatusDTO userStatusDTO) {
         backendUserService.setUserStatus(userStatusDTO);

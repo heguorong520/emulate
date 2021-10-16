@@ -1,0 +1,29 @@
+{
+    "data": [{ "target": "_self", "icon": "fa fa-address-book", "name": "系统配置", "url": null, "perms": null, "shortcut": 0, "child": [{ "target": "_self", "icon": "fa", "name": "用户管理", "url": "page/user/list.html", "perms": null, "shortcut": 0, "child": [], "menuId": 2, "parentName": "系统配置", "title": "用户管理", "href": "page/user/list.html" }, { "target": "_self", "icon": "fa", "name": "角色管理", "url": "page/role/list.html", "perms": null, "shortcut": 0, "child": [], "menuId": 3, "parentName": "系统配置", "title": "角色管理", "href": "page/role/list.html" }, { "target": "_self", "icon": "fa", "name": "菜单管理", "url": "page/menu/list.html", "perms": null, "shortcut": 0, "child": [], "menuId": 4, "parentName": "系统配置", "title": "菜单管理", "href": "page/menu/list.html" }], "menuId": 1, "parentName": null, "title": "系统配置", "href": null }, {
+        "target": "_self",
+        "icon": "fa fa-address-book",
+        "name": "UI示例",
+        "url": "",
+        "perms": null,
+        "shortcut": 0,
+        "child": [{ "target": "_self", "icon": "fa", "name": "组合表单", "url": "page/form.html", "perms": null, "shortcut": 0, "child": [], "menuId": 6, "parentName": "UI示例", "title": "组合表单", "href": "page/form.html" }, { "target": "_self", "icon": "fa", "name": "分步表单", "url": "page/form-step.html", "perms": null, "shortcut": 0, "child": [], "menuId": 7, "parentName": "UI示例", "title": "分步表单", "href": "page/form-step.html" }, { "target": "_self", "icon": "fa", "name": "layer示例", "url": "page/layer.html", "perms": null, "shortcut": 0, "child": [], "menuId": 8, "parentName": "UI示例", "title": "layer示例", "href": "page/layer.html" }, { "target": "_self", "icon": "fa", "name": "富文本示例", "url": "page/editor.html", "perms": null, "shortcut": 0, "child": [], "menuId": 9, "parentName": "UI示例", "title": "富文本示例", "href": "page/editor.html" }, { "target": "_self", "icon": "fa", "name": "表格示例", "url": "page/table.html", "perms": null, "shortcut": 0, "child": [], "menuId": 10, "parentName": "UI示例", "title": "表格示例", "href": "page/table.html" }, {
+            "target": "_self",
+            "icon": "fa",
+            "name": "上传示例",
+            "url": "page/upload.html",
+            "perms": null,
+            "shortcut": 0,
+            "child": [],
+            "menuId": 11,
+            "parentName": "UI示例",
+            "title": "上传示例",
+            "href": "page/upload.html"
+        }, { "target": "_self", "icon": "fa", "name": "按钮示例", "url": "page/button.html", "perms": null, "shortcut": 0, "child": [], "menuId": 12, "parentName": "UI示例", "title": "按钮示例", "href": "page/button.html" }],
+        "menuId": 5,
+        "parentName": null,
+        "title": "UI示例",
+        "href": ""
+    }],
+    "code": 200,
+    "msg": "操作成功"
+}

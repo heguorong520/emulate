@@ -1,0 +1,20 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": [
+    	{"name": "用户管理", "menuId": "1"},
+    	{"name": "用户组管理", "menuId": "2",   "child": [
+    		{"name": "角色管理", "menuId": "99",   "child":[
+    			{"name": "添加角色", "menuId": "3" },
+    			{"name": "角色列表", "menuId": "4" }
+    		]},
+          {"name": "管理员管理", "menuId": "5", "child":[
+            {"name": "添加管理员", "menuId": "6"},
+            {"name": "管理员列表", "menuId": "6"},
+            {"name": "管理员管理", "menuId": "7"}
+          ]}
+        ]},
+        {"name": "API管理", "menuId": "8" },
+        {"name": "订单管理", "menuId": "9"}
+    ]
+}
