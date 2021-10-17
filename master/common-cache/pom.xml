@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <groupId>com.emulate</groupId>
-    <artifactId>common-redis</artifactId>
+    <artifactId>common-cache</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
@@ -25,6 +25,10 @@
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

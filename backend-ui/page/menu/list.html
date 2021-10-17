@@ -22,7 +22,7 @@
                 <script type="text/html" id="toolbarDemo">
                     <div class="layui-btn-container">
                         <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="reload"> 重新加载 </button>
-                        <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
+                        <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn permissions" perms="menu:save" lay-event="add" > 添加 </button>
                     </div>
                 </script>
                 <table id="currentTable" class="layui-table" lay-filter="currentTableFilter"></table>
@@ -31,9 +31,9 @@
     </div>
     <!-- 操作列 -->
     <script type="text/html" id="addChildTeamplate">
-        <a class="layui-btn layui-btn-primary layui-btn-xs   {{# if(d.type === 2){ }} layui-hide {{# }}}"  lay-event="addChild">添加下级</a>
-        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
-        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        <a class="layui-btn layui-btn-primary layui-btn-xs permissions  {{# if(d.type === 2){ }} layui-hide {{# }}}" perms="menu:save" lay-event="addChild">添加下级</a>
+        <a class="layui-btn layui-btn-primary layui-btn-xs permissions" lay-event="edit" perms="menu:save">修改</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs permissions" lay-event="del"  perms="menu:delete">删除</a>
     </script>
 
     <script src="../../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>

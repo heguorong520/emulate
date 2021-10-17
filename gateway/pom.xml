@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>com.emulate</groupId>
-            <artifactId>common-redis</artifactId>
+            <artifactId>common-cache</artifactId>
         </dependency>
     </dependencies>
 </project>

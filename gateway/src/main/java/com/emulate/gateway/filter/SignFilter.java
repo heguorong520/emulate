@@ -9,16 +9,14 @@ import com.emulate.core.enums.HeaderKeyEnum;
 import com.emulate.core.utils.AESUtil;
 import com.emulate.core.yml.AuthSignYml;
 import com.emulate.gateway.util.FilterCommonUtil;
-import com.emulate.redis.service.RedisService;
+import com.emulate.cache.redis.service.RedisService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.server.ServerWebExchange;
@@ -27,7 +25,6 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
 
 @Slf4j

@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.emulate.permissions.user.UserDetail;
 import com.emulate.permissions.util.PermissionsUserUtil;
-import com.emulate.redis.service.RedisService;
+import com.emulate.cache.redis.service.RedisService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 

@@ -22,7 +22,7 @@ import com.emulate.core.jwt.TokenUtil;
 import com.emulate.core.utils.AESUtil;
 import com.emulate.database.page.PageData;
 import com.emulate.permissions.util.PermissionsUserUtil;
-import com.emulate.redis.service.RedisService;
+import com.emulate.cache.redis.service.RedisService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -14,7 +14,7 @@
     </parent>
     <modules>
         <module>common-core</module>
-        <module>common-redis</module>
+        <module>common-cache</module>
         <module>common-database</module>
         <module>common-swagger</module>
         <module>common-permissions</module>

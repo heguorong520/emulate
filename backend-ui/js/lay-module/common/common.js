@@ -268,7 +268,7 @@ layui.define(["jquery", 'miniAESUtil', "requestUtil", "table", "form","laytpl"],
                     console.log(XMLHttpRequest)
                     if (obj.code == 401) {
                         window.localStorage.setItem(constUtil.AUTHORIZATION, "")
-                        window.parent.location = GetUrlRelativePath +'/login.html';
+                        window.parent.location = GetUrlRelativePath() +'/login.html';
                     }
                 } catch (e) {
                     console.log("page");
@@ -280,7 +280,7 @@ layui.define(["jquery", 'miniAESUtil', "requestUtil", "table", "form","laytpl"],
 　　　　var url = document.location.toString();
 　　　　var arrUrl = url.split("//");
 　　　　var start = arrUrl[1].split("/");
-　　　　return arrUrl[0]+"//"+start[0]+"/"+start[1];
+　　　　return arrUrl[0]+"//"+start[0]+"/"+start[1]+"/"+start[2];
 　　	 }
     exports("common", common);
 });

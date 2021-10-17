@@ -1,4 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.emulate.redis.config.RedisConfig
+  com.emulate.cache.redis.config.RedisConfig
 
 
