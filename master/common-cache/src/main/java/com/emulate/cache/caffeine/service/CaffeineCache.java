@@ -1,9 +1,13 @@
 package com.emulate.cache.caffeine.service;
 
-
 import com.emulate.cache.caffeine.builder.CaffeineBuilder;
 import com.github.benmanes.caffeine.cache.Cache;
 
+/**
+ * @description: 封装本地缓存的方法
+ * @author hgr
+ * @date 2021/10/18 23:42
+ */
 public class CaffeineCache implements LocalCache {
     private Cache<String, Object> cache;
 
@@ -33,11 +37,6 @@ public class CaffeineCache implements LocalCache {
     @Override
     public void set(String key, Object value) {
         cache.put(key, value);
-    }
-
-    @Override
-    public void set(String key, Object value, long expire) {
-        set(key, value);
     }
 
     @Override

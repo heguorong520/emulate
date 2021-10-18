@@ -1,5 +1,11 @@
 package com.emulate.cache.caffeine.service;
 
+
+/**
+* @description: 本地缓存接口定义
+* @author hgr
+* @date 2021/10/18 23:44
+*/
 public interface LocalCache {
 
     Object get(String key);
@@ -9,8 +15,6 @@ public interface LocalCache {
     void delete(String key);
 
     void set(String key, Object value);
-
-    void set(String key, Object value, long expire);
 
     void removeAll();
 }
