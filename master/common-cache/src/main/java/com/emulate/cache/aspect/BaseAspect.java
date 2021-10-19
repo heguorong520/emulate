@@ -16,6 +16,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -169,6 +170,7 @@ public abstract class BaseAspect {
         return result;
     }
 
+    @Transactional
     protected void saveCacheKeyEntity(String id, String keyPrefix, Integer time) {
         CacheKeyEntity entity = new CacheKeyEntity();
         entity.setId(id);

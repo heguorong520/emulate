@@ -7,6 +7,7 @@ import com.emulate.cache.annotation.LocalCacheEvent;
 import com.emulate.cache.annotation.LocalCachePut;
 import com.emulate.cache.enums.ExpireTimeEnum;
 import com.emulate.cache.enums.ParamDataTypeEnum;
+import com.emulate.cache.redis.entity.CacheKeyEntity;
 import com.emulate.cache.redis.repository.CacheKeyRepository;
 import com.emulate.cache.redis.service.RedisService;
 import com.emulate.core.controller.BaseApiController;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author hgr
@@ -31,6 +34,8 @@ public class TestController extends BaseApiController {
 
    @Autowired
    private RedisService redisService;
+    @Autowired
+    private CacheKeyRepository keyRepository;
     @ResponseBody
     @GetMapping("/sa/list")
     @LocalCachePut(keyPrefix = "testCache", dbLock = true, expire = ExpireTimeEnum.second60)
@@ -48,4 +53,16 @@ public class TestController extends BaseApiController {
     public ResultBody<?> list(@CMPKey String userName) {
         return ResultBody.ok();
     }
+
+    @ResponseBody
+    @GetMapping("/sa/testKey")
+    public ResultBody<List<CacheKeyEntity>> testKey() {
+        return ResultBody.ok(keyRepository.findByApplicationNameKeyPrefix("service-backend:testCache"));
+    }
+    @ResponseBody
+    @GetMapping("/sa/all")
+    public ResultBody<List<CacheKeyEntity>> allKey() {
+        return ResultBody.ok(keyRepository.findAll());
+    }
+
 }
