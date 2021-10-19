@@ -2,11 +2,10 @@ package com.emulate.cache.annotation;
 
 import java.lang.annotation.*;
 
-import com.emulate.cache.enums.ExpireTimeEnum;
 
 /**
  * @author hgr
- * @description: 本地缓存注解
+ * @description: 本地缓存注解不建议使用在接口上
  * @date 2021/10/1823:46
  */
 
@@ -14,9 +13,5 @@ import com.emulate.cache.enums.ExpireTimeEnum;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface LocalCacheEvent {
-
-    ExpireTimeEnum expire() default ExpireTimeEnum.second5;
-
     String keyPrefix() default "localCache";
-
 }

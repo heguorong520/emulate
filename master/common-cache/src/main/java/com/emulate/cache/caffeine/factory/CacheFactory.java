@@ -37,4 +37,15 @@ public class CacheFactory {
         return localCache;
     }
 
+    /**
+     * @description: 删除对应的缓存
+     * @author hgr
+     * @param cacheKey 缓存的Key
+     * @date 2021/10/18 23:32
+     */
+    public static void cleanAllCacheByKey(String cacheKey) {
+        MAP_CACHE.forEach((index,localCache)->{
+            localCache.delete(cacheKey);
+        });
+    }
 }

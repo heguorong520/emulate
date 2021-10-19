@@ -1,4 +1,3 @@
- 
 
 package com.emulate.backend.entity;
 
@@ -15,83 +14,78 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * 系统用户
- *
- * @author Mark sunlightcs@gmail.com
- */
 @Data
 @TableName("backend_user")
 public class BackendUserEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * 用户ID
-	 */
-	@TableId
-	private Long userId;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * 用户名
-	 */
-	private String username;
+    /**
+     * 用户ID
+     */
+    @TableId
+    private Long userId;
 
-	/**
-	 * 密码
-	 */
-	@JsonIgnore
-	private String password;
+    /**
+     * 用户名
+     */
+    private String username;
 
-	/**
-	 * 盐
-	 */
-	@JsonIgnore
-	private String salt;
+    /**
+     * 密码
+     */
+    @JsonIgnore
+    private String password;
 
+    /**
+     * 盐
+     */
+    @JsonIgnore
+    private String salt;
 
-	/**
-	 * 手机号
-	 */
-	private String mobile;
+    /**
+     * 手机号
+     */
+    private String mobile;
 
-	/**
-	 * 状态  0：禁用   1：正常
-	 */
-	private Integer status;
-	
-	/**
-	 * 角色ID列表
-	 */
-	@TableField(exist=false)
-	private List<Long> roleIdList;
+    /**
+     * 状态 0：禁用 1：正常
+     */
+    private Integer status;
 
-	/**
-	 * 创建时间
-	 */
-	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
-	private Date createTime;
+    /**
+     * 角色ID列表
+     */
+    @TableField(exist = false)
+    private List<Long> roleIdList;
 
-	/**
-	 * 角色ID列表
-	 */
-	@TableField(exist=false)
-	private List<String> roleNameList;
+    /**
+     * 创建时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date createTime;
 
-	public List<String> getRoleNameList(){
-		if(roleNameList == null) {
-			roleNameList = new ArrayList<>();
-		}
-		return roleNameList;
-	}
-	public List<Long> getRoleIdList(){
-		if(roleIdList == null) {
-			roleIdList = new ArrayList<>();
-		}
-		return roleIdList;
-	}
+    /**
+     * 角色ID列表
+     */
+    @TableField(exist = false)
+    private List<String> roleNameList;
 
-	/**
-	 * 用户名
-	 */
-	private String nickname;
+    public List<String> getRoleNameList() {
+        if (roleNameList == null) {
+            roleNameList = new ArrayList<>();
+        }
+        return roleNameList;
+    }
+
+    public List<Long> getRoleIdList() {
+        if (roleIdList == null) {
+            roleIdList = new ArrayList<>();
+        }
+        return roleIdList;
+    }
+
+    /**
+     * 用户名
+     */
+    private String nickname;
 }

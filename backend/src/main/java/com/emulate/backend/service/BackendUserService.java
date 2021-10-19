@@ -1,7 +1,5 @@
 
-
 package com.emulate.backend.service;
-
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
@@ -32,7 +30,6 @@ import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Service
 @Transactional(readOnly = true)
 public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserEntity> {
@@ -51,26 +48,23 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
     }
 
     public PageData<BackendUserEntity> findPage(QueryUserDTO userBodyDTO) {
-        IPage<BackendUserEntity> page = this.page(
-                new Page<>(userBodyDTO.getPage(), userBodyDTO.getLimit()),
-                new QueryWrapper<BackendUserEntity>().
-                        eq(StringUtils.isNotBlank(userBodyDTO.getUsername()), "username", userBodyDTO.getUsername()).
-                        eq(StringUtils.isNotBlank(userBodyDTO.getNickname()), "nickname", userBodyDTO.getNickname()).
-                        orderByDesc("create_time")
-        );
-        //角色列表
+        IPage<BackendUserEntity> page = this.page(new Page<>(userBodyDTO.getPage(), userBodyDTO.getLimit()),
+            new QueryWrapper<BackendUserEntity>()
+                .eq(StringUtils.isNotBlank(userBodyDTO.getUsername()), "username", userBodyDTO.getUsername())
+                .eq(StringUtils.isNotBlank(userBodyDTO.getNickname()), "nickname", userBodyDTO.getNickname())
+                .orderByDesc("create_time"));
+        // 角色列表
         if (page.getRecords().size() > 0) {
-            List<Long> userIds = page.getRecords().
-                    stream().
-                    map(BackendUserEntity::getUserId).
-                    collect(Collectors.toList());
-            //获取用户对应角色ID
-            Map<Long, List<Long>> userRoleIdMaps = backendUserRoleService.findRoleIdList(userIds.toArray(new Long[userIds.size() - 1]));
+            List<Long> userIds =
+                page.getRecords().stream().map(BackendUserEntity::getUserId).collect(Collectors.toList());
+            // 获取用户对应角色ID
+            Map<Long, List<Long>> userRoleIdMaps =
+                backendUserRoleService.findRoleIdList(userIds.toArray(new Long[userIds.size() - 1]));
             List<Long> roleIds = new ArrayList<>();
             userRoleIdMaps.forEach((k, v) -> {
                 roleIds.addAll(v);
             });
-            //角色名称填充处理
+            // 角色名称填充处理
             Map<Long, String> roleNameMap = backendRoleService.findRoleNameMap(roleIds);
             for (BackendUserEntity u : page.getRecords()) {
                 if (!userRoleIdMaps.containsKey(u.getUserId())) {
@@ -89,7 +83,6 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         return new PageData<>(page);
     }
 
-
     @Transactional(rollbackFor = Exception.class)
     public void saveUser(BackendUserDTO userDTO) {
         BackendUserEntity user = Convert.convert(BackendUserEntity.class, userDTO);
@@ -99,10 +92,9 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         }
         user.setStatus(0);
         this.saveOrUpdate(user);
-        //保存用户与角色关系
+        // 保存用户与角色关系
         backendUserRoleService.saveOrUpdate(user.getUserId(), user.getRoleIdList());
     }
-
 
     @Transactional
     public boolean updatePassword(Long userId, String password, String newPassword) {
@@ -111,11 +103,11 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         String aesPwd = AESUtil.encrypt(password, AESUtil.PASSWORD_KEY);
         BackendUserEntity backendUserEntity = this.baseMapper.selectById(userId);
         if (!backendUserEntity.getPassword().equals(aesPwd)) {
-            //旧密码校验通过
+            // 旧密码校验通过
             throw new CustomizeException(GlobalErrorEnum.旧密码错误);
         }
         return this.update(userEntity,
-                new QueryWrapper<BackendUserEntity>().eq("user_id", userId).eq("password", aesPwd));
+            new QueryWrapper<BackendUserEntity>().eq("user_id", userId).eq("password", aesPwd));
     }
 
     /**
@@ -131,19 +123,20 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
             throw new CustomizeException(GlobalErrorEnum.用户不存在);
         }
 
-        if (!backendUserEntity.getPassword().equals(AESUtil.encrypt(backendLoginDTO.getPassword(), AESUtil.PASSWORD_KEY))) {
+        if (!backendUserEntity.getPassword()
+            .equals(AESUtil.encrypt(backendLoginDTO.getPassword(), AESUtil.PASSWORD_KEY))) {
             throw new CustomizeException(GlobalErrorEnum.密码错误);
         }
         String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + backendUserEntity.getUserId();
         String permsCacheKey = RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheKey() + backendUserEntity.getUserId();
-        String token = (String) redisService.get(tokenCacheKey);
+        String token = (String)redisService.get(tokenCacheKey);
 
         if (token == null) {
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("username", backendUserEntity.getUsername());
             userInfo.put("userId", backendUserEntity.getUserId());
             token = TokenUtil.createTokenBackend(JSONObject.toJSONString(userInfo));
-            //保存TOKEN在缓存中做登录权限进行对比
+            // 保存TOKEN在缓存中做登录权限进行对比
             redisService.set(tokenCacheKey, token, RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheTime());
         }
         BackendLoginResultDTO resultDTO = new BackendLoginResultDTO();
@@ -151,7 +144,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         resultDTO.setUsername(backendUserEntity.getUsername());
         resultDTO.setToken(token);
         resultDTO.setPerms(findUserPerms(backendUserEntity.getUserId()));
-        redisService.set(permsCacheKey,resultDTO.getPerms(),RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheTime());
+        redisService.set(permsCacheKey, resultDTO.getPerms(), RedisCacheKeyEnum.USER_SHIRO_PERMS_KEY.getCacheTime());
         return resultDTO;
     }
 
@@ -163,7 +156,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         if (PermissionsUserUtil.getUserDetail() == null) {
             throw new CustomizeException(GlobalErrorEnum.无权访问);
         }
-        //清理缓存中的TOKEN即可
+        // 清理缓存中的TOKEN即可
         String tokenCacheKey = RedisCacheKeyEnum.BACKEND_TOKEN_KEY.getCacheKey() + PermissionsUserUtil.getUserId();
         redisService.del(tokenCacheKey);
     }
@@ -176,7 +169,7 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
 
     @Transactional
     public void setUserStatus(BackendUserStatusDTO userStatusDTO) {
-        //设置用户状态e
+        // 设置用户状态e
         UpdateWrapper<BackendUserEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.set("status", userStatusDTO.getStatus());
         updateWrapper.eq("user_id", userStatusDTO.getUserId());
@@ -194,6 +187,5 @@ public class BackendUserService extends ServiceImpl<BackendUserDao, BackendUserE
         }
         return result;
     }
-
 
 }

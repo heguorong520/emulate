@@ -1,7 +1,6 @@
 
 package com.emulate.backend.controller;
 
-
 import com.emulate.backend.dto.BackendRoleDTO;
 import com.emulate.backend.dto.QueryRoleDTO;
 import com.emulate.backend.entity.BackendRoleEntity;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-
 @Api(tags = "角色管理")
 @RestController
 public class RoleController extends BaseApiController {
@@ -34,7 +32,6 @@ public class RoleController extends BaseApiController {
         PageData page = backendRoleService.findPage(queryRoleDTO);
         return ResultBody.ok(page);
     }
-
 
     @Permissions(perms = "role:select")
     @ApiOperation("用户分配角色")

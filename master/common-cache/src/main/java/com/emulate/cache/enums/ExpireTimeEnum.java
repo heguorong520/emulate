@@ -18,4 +18,8 @@ public enum ExpireTimeEnum {
     ExpireTimeEnum(int expire){
         this.expire = expire;
     }
+
+    public int time() {
+        return expire;
+    }
 }

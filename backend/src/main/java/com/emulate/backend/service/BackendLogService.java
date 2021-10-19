@@ -1,4 +1,3 @@
- 
 
 package com.emulate.backend.service;
 
@@ -14,16 +13,13 @@ import com.emulate.database.page.PageData;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service
 @Transactional(readOnly = true)
 public class BackendLogService extends ServiceImpl<BackendLogDao, BackendLogEntity> {
 
     public PageData<BackendLogEntity> findPage(QueryLogDTO queryLogDTO) {
-        IPage<BackendLogEntity> page = this.page(
-            new Page<>(queryLogDTO.getPage(),queryLogDTO.getLimit()),
-            new QueryWrapper<BackendLogEntity>()
-        );
+        IPage<BackendLogEntity> page =
+            this.page(new Page<>(queryLogDTO.getPage(), queryLogDTO.getLimit()), new QueryWrapper<BackendLogEntity>());
         return new PageData<>(page);
     }
 }

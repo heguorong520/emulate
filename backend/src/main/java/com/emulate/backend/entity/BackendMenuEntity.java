@@ -1,4 +1,3 @@
- 
 
 package com.emulate.backend.entity;
 
@@ -18,69 +17,69 @@ import java.util.List;
 @Data
 @TableName("backend_menu")
 public class BackendMenuEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * 菜单ID
-	 */
-	@TableId
-	private Long menuId;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * 父菜单ID，一级菜单为0
-	 */
-	private Long parentId;
-	
-	/**
-	 * 父菜单名称
-	 */
-	@TableField(exist=false)
-	private String parentName;
+    /**
+     * 菜单ID
+     */
+    @TableId
+    private Long menuId;
 
-	/**
-	 * 菜单名称
-	 */
-	@NotBlank(message = "名称不能为空")
-	private String name;
+    /**
+     * 父菜单ID，一级菜单为0
+     */
+    private Long parentId;
 
-	/**
-	 * 菜单URL
-	 */
-	private String url;
+    /**
+     * 父菜单名称
+     */
+    @TableField(exist = false)
+    private String parentName;
 
-	/**
-	 * 授权(多个用逗号分隔，如：user:list,user:create)
-	 */
-	private String perms;
+    /**
+     * 菜单名称
+     */
+    @NotBlank(message = "名称不能为空")
+    private String name;
 
-	/**
-	 * 类型     0：目录   1：菜单   2：按钮
-	 */
-	private Integer type;
+    /**
+     * 菜单URL
+     */
+    private String url;
 
-	/**
-	 * 菜单图标
-	 */
-	private String icon;
+    /**
+     * 授权(多个用逗号分隔，如：user:list,user:create)
+     */
+    private String perms;
 
-	/**
-	 * 排序
-	 */
-	private Integer orderNum;
-	
-	/**
-	 * ztree属性
-	 */
-	@TableField(exist=false)
-	private Boolean open;
+    /**
+     * 类型 0：目录 1：菜单 2：按钮
+     */
+    private Integer type;
 
-	@TableField(exist=false)
-	private List<?> list;
+    /**
+     * 菜单图标
+     */
+    private String icon;
 
-	/**
-	 * 是否为快捷菜单
-	 */
-	private Integer shortcut;
+    /**
+     * 排序
+     */
+    private Integer orderNum;
 
-	private String target;
+    /**
+     * ztree属性
+     */
+    @TableField(exist = false)
+    private Boolean open;
+
+    @TableField(exist = false)
+    private List<?> list;
+
+    /**
+     * 是否为快捷菜单
+     */
+    private Integer shortcut;
+
+    private String target;
 }

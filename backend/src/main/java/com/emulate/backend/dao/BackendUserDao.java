@@ -1,4 +1,3 @@
- 
 
 package com.emulate.backend.dao;
 
@@ -9,23 +8,20 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * 系统用户
- *
- * @author Mark sunlightcs@gmail.com
- */
 @Mapper
 public interface BackendUserDao extends BaseMapper<BackendUserEntity> {
-	
-	/**
-	 * 查询用户的所有权限
-	 * @param userId  用户ID
-	 */
-	List<String> queryAllPerms(Long userId);
-	
-	/**
-	 * 查询用户的所有菜单ID
-	 */
-	List<Long> queryAllMenuId(@Param("userId") Long userId);
+
+    /**
+     * 查询用户的所有权限
+     * 
+     * @param userId
+     *            用户ID
+     */
+    List<String> queryAllPerms(Long userId);
+
+    /**
+     * 查询用户的所有菜单ID
+     */
+    List<Long> queryAllMenuId(@Param("userId") Long userId);
 
 }

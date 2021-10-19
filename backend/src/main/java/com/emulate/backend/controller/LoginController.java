@@ -36,13 +36,12 @@ public class LoginController extends BaseApiController {
     @Resource
     private DefaultKaptcha producer;
 
-
     @ApiOperation("登录")
     @PostMapping("a/login")
     public ResultBody<BackendLoginResultDTO> login(@Valid @RequestBody BackendLoginDTO loginDTO) throws Exception {
-        String key = RedisCacheKeyEnum.CAPTCHA_KEY.getCacheKey()+HeaderKeyEnum.DEVICEID.value();
-        String code = (String) redisTemplate.opsForValue().get(key);
-        if(!loginDTO.getCode().equals(code)){
+        String key = RedisCacheKeyEnum.CAPTCHA_KEY.getCacheKey() + HeaderKeyEnum.DEVICEID.value();
+        String code = (String)redisTemplate.opsForValue().get(key);
+        if (!loginDTO.getCode().equals(code)) {
             throw new CustomizeException("验证码错误!");
         }
         return ResultBody.ok(backendUserService.login(loginDTO));
@@ -50,21 +49,21 @@ public class LoginController extends BaseApiController {
 
     @ApiOperation("退出登录")
     @PostMapping("/logout")
-    public ResultBody<?> logout(){
+    public ResultBody<?> logout() {
         backendUserService.logout();
         return ResultBody.ok();
     }
 
     @ApiOperation("验证码")
     @GetMapping("sa/captcha.jpg")
-    public void captcha(String deviceId,HttpServletResponse response, HttpServletRequest request)throws IOException {
+    public void captcha(String deviceId, HttpServletResponse response, HttpServletRequest request) throws IOException {
         response.setHeader("Cache-Control", "no-store, no-cache");
         response.setContentType("image/jpeg");
-        //生成文字验证码
+        // 生成文字验证码
         String text = producer.createText();
-        redisTemplate.opsForValue().set(RedisCacheKeyEnum.CAPTCHA_KEY.
-                getCacheKey()+deviceId,text,RedisCacheKeyEnum.CAPTCHA_KEY.getCacheTime(), TimeUnit.SECONDS);
-        //生成图片验证码
+        redisTemplate.opsForValue().set(RedisCacheKeyEnum.CAPTCHA_KEY.getCacheKey() + deviceId, text,
+            RedisCacheKeyEnum.CAPTCHA_KEY.getCacheTime(), TimeUnit.SECONDS);
+        // 生成图片验证码
         BufferedImage image = producer.createImage(text);
 
         ServletOutputStream out = response.getOutputStream();
@@ -76,7 +75,7 @@ public class LoginController extends BaseApiController {
      */
     @GetMapping("login/info")
     public ResultBody<?> info() {
-       // AuthFilter.backendLoginUserDTO()
+        // AuthFilter.backendLoginUserDTO()
         return ResultBody.ok();
     }
 

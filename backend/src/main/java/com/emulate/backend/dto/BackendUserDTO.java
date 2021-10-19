@@ -1,7 +1,5 @@
 
-
 package com.emulate.backend.dto;
-
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

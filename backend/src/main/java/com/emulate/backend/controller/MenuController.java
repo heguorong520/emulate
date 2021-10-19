@@ -67,9 +67,9 @@ public class MenuController extends BaseApiController {
     @Permissions(perms = "menu:select")
     @GetMapping("menu/select")
     public ResultBody<List<BackendMenuDTO>> select() {
-        //查询列表数据
+        // 查询列表数据
         List<BackendMenuDTO> menuList = backendMenuService.findNotButtonList();
-        //添加顶级菜单
+        // 添加顶级菜单
         BackendMenuDTO root = new BackendMenuDTO();
         root.setMenuId(0L);
         root.setName("目录上级");
@@ -83,12 +83,11 @@ public class MenuController extends BaseApiController {
     @Permissions(perms = "menu:save")
     @ApiOperation("保存菜单")
     @PostMapping("menu/save")
-    public ResultBody<?> save(@Valid  @RequestBody BackendMenuEntity menu) {
+    public ResultBody<?> save(@Valid @RequestBody BackendMenuEntity menu) {
         verifyForm(menu);
         backendMenuService.saveOrUpdate(menu);
         return ResultBody.ok();
     }
-
 
     @Permissions(perms = "menu:delete")
     @ApiOperation("删除菜单")
@@ -97,7 +96,7 @@ public class MenuController extends BaseApiController {
         if (id <= 31) {
             return ResultBody.error(GlobalErrorEnum.不能删除);
         }
-        //判断是否有子菜单或按钮
+        // 判断是否有子菜单或按钮
         List<BackendMenuEntity> menuList = backendMenuService.findListParentId(id);
         if (menuList.size() > 0) {
             return ResultBody.error(GlobalErrorEnum.存在子节点);
@@ -118,23 +117,22 @@ public class MenuController extends BaseApiController {
             throw new CustomizeException("上级菜单不能为空");
         }
 
-        //菜单
+        // 菜单
         if (Objects.equals(menu.getType(), MenuTypeEnum.菜单.getValue())) {
             if (StringUtils.isBlank(menu.getUrl())) {
                 throw new CustomizeException("菜单URL不能为空");
             }
         }
 
-        //上级菜单类型
+        // 上级菜单类型
         int parentType = MenuTypeEnum.目录.getValue();
         if (menu.getParentId() != 0) {
             BackendMenuEntity parentMenu = backendMenuService.getById(menu.getParentId());
             parentType = parentMenu.getType();
         }
 
-        //目录、菜单
-        if (menu.getType() == MenuTypeEnum.目录.getValue() ||
-                menu.getType() == MenuTypeEnum.菜单.getValue()) {
+        // 目录、菜单
+        if (menu.getType() == MenuTypeEnum.目录.getValue() || menu.getType() == MenuTypeEnum.菜单.getValue()) {
             if (parentType != MenuTypeEnum.目录.getValue()) {
                 throw new CustomizeException("上级菜单只能为目录类型");
             }

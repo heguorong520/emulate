@@ -28,18 +28,15 @@ public class BackendMenuDTO implements Serializable {
     public Long menuId;
 
     public List<BackendMenuDTO> getChild() {
-        if(child == null)
-        return Collections.emptyList();
+        if (child == null)
+            return Collections.emptyList();
         return child;
     }
 
-
-
-    //冗余字段
+    // 冗余字段
     private String parentName;
 
     public String title;
-
 
     public String href;
 }

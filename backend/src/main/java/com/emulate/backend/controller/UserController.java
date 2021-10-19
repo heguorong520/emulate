@@ -1,7 +1,5 @@
 
-
 package com.emulate.backend.controller;
-
 
 import com.emulate.backend.dto.BackendUpdatePwdDTO;
 import com.emulate.backend.dto.BackendUserDTO;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-
 /**
  * 系统用户
  */
@@ -36,7 +33,7 @@ public class UserController extends BaseApiController {
     private BackendUserRoleService backendUserRoleService;
 
     @ApiOperation("用户列表")
-    @Permissions(perms="user:list")
+    @Permissions(perms = "user:list")
     @GetMapping("user/list")
     public ResultBody<?> list(@ModelAttribute QueryUserDTO queryUserDTO) {
         PageData page = backendUserService.findPage(queryUserDTO);
@@ -44,12 +41,13 @@ public class UserController extends BaseApiController {
         return ResultBody.ok(page);
     }
 
-    @Permissions(perms="user:password")
+    @Permissions(perms = "user:password")
     @ApiOperation("修改密码")
     @PostMapping("user/password")
     public ResultBody<?> password(@RequestBody @Valid BackendUpdatePwdDTO backendUpdatePwdDTO) {
-        //更新密码
-        boolean flag = backendUserService.updatePassword(PermissionsUserUtil.getUserId(), backendUpdatePwdDTO.getPassword(), backendUpdatePwdDTO.getNewPassword());
+        // 更新密码
+        boolean flag = backendUserService.updatePassword(PermissionsUserUtil.getUserId(),
+            backendUpdatePwdDTO.getPassword(), backendUpdatePwdDTO.getNewPassword());
         if (!flag) {
             throw new CustomizeException("原密码不正确");
         }
@@ -57,7 +55,7 @@ public class UserController extends BaseApiController {
         return ResultBody.ok();
     }
 
-    @Permissions(perms="user:save")
+    @Permissions(perms = "user:save")
     @ApiOperation("保存用户")
     @PostMapping("user/save")
     public ResultBody<?> save(@Valid @RequestBody BackendUserDTO user) {
@@ -67,7 +65,7 @@ public class UserController extends BaseApiController {
         return ResultBody.ok();
     }
 
-    @Permissions(perms="user:save")
+    @Permissions(perms = "user:save")
     @ApiOperation("删除用户")
     @PostMapping("user/delete")
     public ResultBody<?> delete(@RequestBody Long[] userIds) {
@@ -81,8 +79,9 @@ public class UserController extends BaseApiController {
         backendUserService.deleteByUserId(userIds);
         return ResultBody.ok();
     }
+
     @ApiOperation("禁用启用")
-    @Permissions(perms="user:status")
+    @Permissions(perms = "user:status")
     @PostMapping("user/status")
     public ResultBody<?> status(@Valid @RequestBody BackendUserStatusDTO userStatusDTO) {
         backendUserService.setUserStatus(userStatusDTO);

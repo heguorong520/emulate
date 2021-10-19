@@ -14,7 +14,6 @@ import java.util.List;
 @Data
 public class BackendRoleDTO implements Serializable {
 
-
     /**
      * 角色ID
      */
@@ -31,7 +30,6 @@ public class BackendRoleDTO implements Serializable {
      */
     @NotBlank(message = "备注不能为空")
     private String remark;
-
 
     @NotNull(message = "菜单不能为空")
     private List<Long> menuIdList;
