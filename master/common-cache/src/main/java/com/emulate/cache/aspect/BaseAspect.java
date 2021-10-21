@@ -7,8 +7,10 @@ import com.emulate.cache.annotation.LocalCacheEvent;
 import com.emulate.cache.annotation.LocalCachePut;
 import com.emulate.cache.caffeine.factory.CacheFactory;
 import com.emulate.cache.caffeine.service.LocalCache;
+import com.emulate.cache.enums.LocalCacheSubEventEnum;
 import com.emulate.cache.enums.ParamDataTypeEnum;
 import com.emulate.cache.redis.entity.CacheKeyEntity;
+import com.emulate.cache.redis.entity.LocalCacheUpdateEntity;
 import com.emulate.cache.redis.repository.CacheKeyRepository;
 import com.emulate.cache.redis.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +44,7 @@ public abstract class BaseAspect {
     @Autowired
     private RedisService redisService;
     @Value("${spring.application.name}")
-    private String applicationName;
+    protected String applicationName;
 
     protected static final ConcurrentMap<String, Lock> LOCK_MAP = new ConcurrentHashMap<>();
 
@@ -129,12 +131,9 @@ public abstract class BaseAspect {
                     return result;
                 }
                 result = point.proceed();
+                publishLocalCacheUpdateMsg(cacheKey,localCachePut.expire().time(),LocalCacheSubEventEnum.NEW,result==null?"":result,null);
                 saveCacheKeyEntity(cacheKey, localCachePut.keyPrefix(), localCachePut.expire().time());
-                if (result != null) {
-                    localCache.set(cacheKey, result);
-                    return result;
-                }
-                localCache.set(cacheKey, "");
+                return result;
             }
         }
 
@@ -142,12 +141,20 @@ public abstract class BaseAspect {
             LocalCacheEvent localCacheEvent = (LocalCacheEvent)annotation;
             result = point.proceed();
             List<String> keyList = getCacheKeyList(localCacheEvent.keyPrefix());
-            for (String key : keyList) {
-                CacheFactory.cleanAllCacheByKey(key);
-                log.debug("【LocalCacheEvent】清理的Key:{}",key);
-            }
+            if(ObjectUtil.isNotEmpty(keyList))
+            publishLocalCacheUpdateMsg(null,null,LocalCacheSubEventEnum.CLEAR,null,keyList);
         }
         return result;
+    }
+
+    public void  publishLocalCacheUpdateMsg(String cacheKey,Integer time,LocalCacheSubEventEnum eventEnum,Object content,List<String> keys){
+        LocalCacheUpdateEntity updateEntity = new LocalCacheUpdateEntity();
+        updateEntity.setKey(cacheKey);
+        updateEntity.setTime(time);
+        updateEntity.setEvenEnum(eventEnum);
+        updateEntity.setContent(content);
+        updateEntity.setKeys(keys);
+        redisService.publishLocalCacheUpdateMsg(applicationName,updateEntity);
     }
 
     protected String getKey(ProceedingJoinPoint point, String keyPrefix) throws IllegalAccessException {

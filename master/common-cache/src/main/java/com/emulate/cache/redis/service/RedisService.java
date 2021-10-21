@@ -3,6 +3,7 @@ package com.emulate.cache.redis.service;
 import com.alibaba.fastjson.JSONObject;
 import com.emulate.cache.redis.util.RedisLockUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class RedisService {
+
 
 	private RedisTemplate<String, Object> redisTemplate;
 
@@ -716,4 +718,7 @@ public class RedisService {
 		redisLockUtil.releaseLock(key, "");
 	}
 
+	public void publishLocalCacheUpdateMsg(String channel,Object message){
+		redisTemplate.convertAndSend(channel,message);
+	}
 }
