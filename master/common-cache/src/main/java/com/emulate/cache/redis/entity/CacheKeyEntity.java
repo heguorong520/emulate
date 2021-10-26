@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.index.Indexed;
  * @description: 存储缓存key集合
  * @date 2021/10/19 1:08
  */
-@RedisHash("${spring.application.name}")
+@RedisHash(value = "cache:key:hash",timeToLive = 60*60)
 @Data
 public class CacheKeyEntity {
     @Id
