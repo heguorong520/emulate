@@ -14,12 +14,7 @@ import org.springframework.core.annotation.Order;
 import lombok.extern.slf4j.Slf4j;
 
 
-/**
- * Redisson自动化配置
- *
- * @author pangu
- * @date 2020-10-20
- */
+
 @Slf4j
 @Configuration
 @ConditionalOnClass(Redisson.class)
