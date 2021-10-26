@@ -5,7 +5,9 @@ import org.apache.shardingsphere.shardingjdbc.jdbc.adapter.AbstractDataSourceAda
 import org.apache.shardingsphere.shardingjdbc.jdbc.core.context.RuntimeContext;
 import org.apache.shardingsphere.shardingjdbc.jdbc.core.datasource.MasterSlaveDataSource;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * 自定义masterSlave数据库源
@@ -14,25 +16,25 @@ import java.sql.SQLException;
 public class MyMasterSlaveDataSource extends AbstractDataSourceAdapter {
 
     private final MasterSlaveDataSource masterSlaveDataSource;
+    private final Map<String, DataSource> dataSourceMap;
 
-    private final MyMasterSlaveConnection myMasterSlaveConnection;
+    private final RuntimeContext runtimeContext;
 
     public MyMasterSlaveDataSource(MasterSlaveDataSource masterSlaveDataSource) throws SQLException {
         super(masterSlaveDataSource.getDataSourceMap());
+        this.dataSourceMap = masterSlaveDataSource.getDataSourceMap();
+        this.runtimeContext = masterSlaveDataSource.getRuntimeContext();
         this.masterSlaveDataSource = masterSlaveDataSource;
-        //在此使用自定义数据库连接
-        myMasterSlaveConnection = new MyMasterSlaveConnection(masterSlaveDataSource.getConnection(),masterSlaveDataSource.getDataSourceMap());
     }
-
 
     @Override
     public final MyMasterSlaveConnection getConnection() {
         //这里替换为自己的数据库连接
-        return myMasterSlaveConnection;
+        return new MyMasterSlaveConnection(masterSlaveDataSource.getConnection(),getDataSourceMap());
     }
 
     @Override
     protected RuntimeContext getRuntimeContext() {
-        return masterSlaveDataSource.getRuntimeContext();
+        return runtimeContext;
     }
 }

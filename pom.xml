@@ -17,11 +17,12 @@
 		<java.version>1.8</java.version>
 		<spring-cloud.version>Hoxton.SR3</spring-cloud.version>
 		<!--Swagger Resources-->
+		<redisson.version>3.15.0</redisson.version>
 		<knife4j.version>2.0.8</knife4j.version>
 		<swagger.version>1.5.21</swagger.version>
 		<sharding.version>4.1.1</sharding.version>
 		<mybitis-plaus.version>3.1.1</mybitis-plaus.version>
-		<com.alibaba.version>1.2.6</com.alibaba.version>
+		<com.alibaba.version>1.2.2</com.alibaba.version>
 		<cn.hutool.version>5.7.3</cn.hutool.version>
 		<net.logstash.logback.version>6.6</net.logstash.logback.version>
 		<com.auth0.version>3.8.1</com.auth0.version>
@@ -77,6 +78,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.redisson</groupId>
+				<artifactId>redisson</artifactId>
+				<version>${redisson.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.alibaba.cloud</groupId>
 				<artifactId>spring-cloud-alibaba-dependencies</artifactId>

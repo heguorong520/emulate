@@ -13,6 +13,7 @@ import com.emulate.cache.redis.entity.CacheKeyEntity;
 import com.emulate.cache.redis.entity.LocalCacheUpdateEntity;
 import com.emulate.cache.redis.repository.CacheKeyRepository;
 import com.emulate.cache.redis.service.RedisService;
+import com.emulate.cache.redssion.RedissonLock;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -29,7 +30,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -45,9 +45,16 @@ public abstract class BaseAspect {
     private RedisService redisService;
     @Value("${spring.application.name}")
     protected String applicationName;
+    @Autowired
+    protected RedissonLock redissonLock;
 
     protected static final ConcurrentMap<String, Lock> LOCK_MAP = new ConcurrentHashMap<>();
 
+    /**
+     * @description: 解析注解拼装Key
+     * @author hgr
+     * @date 2021/10/22 0:42
+     */
     protected String getPramsAssembleCacheKey(ProceedingJoinPoint point) throws IllegalAccessException {
         Method method = getMethod(point);
         StringBuilder keyBuilder = new StringBuilder();
@@ -100,83 +107,57 @@ public abstract class BaseAspect {
         return keyBuilder.toString();
     }
 
+    /**
+     * @description: 获取方法信息
+     * @author hgr
+     * @date 2021/10/22 0:41
+     */
     protected Method getMethod(ProceedingJoinPoint point) {
         MethodSignature signature = (MethodSignature)point.getSignature();
         return signature.getMethod();
     }
 
+
+
     /**
-     * @description:选择不同业务执行
-     * @param point
-     * @param annotation
+     * @description: 缓存事件发布
      * @author hgr
-     * @date 2021/10/19 0:42
+     * @date 2021/10/22 0:40
      */
-    protected Object chooseActionBusiness(ProceedingJoinPoint point, Annotation annotation) throws Throwable {
-        Object result = null;
-        if (annotation instanceof LocalCachePut) {
-            LocalCachePut localCachePut = (LocalCachePut)annotation;
-            LocalCache localCache = CacheFactory.getCache(localCachePut.expire().time());
-            String cacheKey = getKey(point, localCachePut.keyPrefix());
-            log.debug("【LocalCachePut】Key:{}",cacheKey);
-            result = localCache.get(cacheKey);
-            if (result != null) {
-                return result;
-            }
-            // 判断访问方法是否加锁加本地锁.根据Key进行加锁
-            if (localCachePut.dbLock()) {
-                Lock lock = LOCK_MAP.getOrDefault(cacheKey, new ReentrantLock());
-                if (!lock.tryLock()) {
-                    result = getLocalCache(localCache, cacheKey);
-                    return result;
-                }
-                result = point.proceed();
-                publishLocalCacheUpdateMsg(cacheKey,localCachePut.expire().time(),LocalCacheSubEventEnum.NEW,result==null?"":result,null);
-                saveCacheKeyEntity(cacheKey, localCachePut.keyPrefix(), localCachePut.expire().time());
-                return result;
-            }
-        }
-
-        if (annotation instanceof LocalCacheEvent) {
-            LocalCacheEvent localCacheEvent = (LocalCacheEvent)annotation;
-            result = point.proceed();
-            List<String> keyList = getCacheKeyList(localCacheEvent.keyPrefix());
-            if(ObjectUtil.isNotEmpty(keyList))
-            publishLocalCacheUpdateMsg(null,null,LocalCacheSubEventEnum.CLEAR,null,keyList);
-        }
-        return result;
-    }
-
-    public void  publishLocalCacheUpdateMsg(String cacheKey,Integer time,LocalCacheSubEventEnum eventEnum,Object content,List<String> keys){
+    public void publishLocalCacheEventMsg(String cacheKey, Integer time, LocalCacheSubEventEnum eventEnum,
+        Object content, List<String> keys) {
         LocalCacheUpdateEntity updateEntity = new LocalCacheUpdateEntity();
         updateEntity.setKey(cacheKey);
         updateEntity.setTime(time);
         updateEntity.setEvenEnum(eventEnum);
         updateEntity.setContent(content);
         updateEntity.setKeys(keys);
-        redisService.publishLocalCacheUpdateMsg(applicationName,updateEntity);
+        redisService.publishLocalCacheUpdateMsg(applicationName, updateEntity);
     }
 
+    /**
+     * key拼装服务名
+     * 
+     * @param point
+     * @param keyPrefix
+     * @return
+     * @throws IllegalAccessException
+     */
     protected String getKey(ProceedingJoinPoint point, String keyPrefix) throws IllegalAccessException {
         StringBuilder keyBuilder = new StringBuilder(applicationName);
         keyBuilder.append(":").append(keyPrefix).append(":").append(getPramsAssembleCacheKey(point));
         return keyBuilder.toString();
     }
 
-    /**
-     * @description: 循环获取本地缓存数据
-     * @author hgr
-     * @date 2021/10/19 15:00
-     */
-    private Object getLocalCache(LocalCache localCache, String key) throws InterruptedException {
-        Thread.sleep(100);
-        Object result = localCache.get(key);
-        if (result == null) {
-            getLocalCache(localCache, key);
-        }
-        return result;
-    }
 
+
+    /**
+     * 保存key用于清理缓存
+     * 
+     * @param id
+     * @param keyPrefix
+     * @param time
+     */
     @Transactional
     protected void saveCacheKeyEntity(String id, String keyPrefix, Integer time) {
         CacheKeyEntity entity = new CacheKeyEntity();

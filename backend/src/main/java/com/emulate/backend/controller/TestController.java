@@ -2,6 +2,7 @@ package com.emulate.backend.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.emulate.backend.dto.QueryLogDTO;
+import com.emulate.backend.service.BackendMenuService;
 import com.emulate.cache.annotation.CMPKey;
 import com.emulate.cache.annotation.LocalCacheEvent;
 import com.emulate.cache.annotation.LocalCachePut;
@@ -36,15 +37,17 @@ public class TestController extends BaseApiController {
    private RedisService redisService;
     @Autowired
     private CacheKeyRepository keyRepository;
+    @Autowired
+    private BackendMenuService backendMenuService;
     @ResponseBody
     @GetMapping("/sa/list")
-    @LocalCachePut(keyPrefix = "testCache", dbLock = true, expire = ExpireTimeEnum.second60)
-    public ResultBody<JSONObject> list(
+    @LocalCachePut(keyPrefix = "testCache", dbLock = true, expire = ExpireTimeEnum.second10)
+    public ResultBody<?> list(
         @ModelAttribute @CMPKey(fields = {"username"}, paramDataType = ParamDataTypeEnum.CDT) QueryLogDTO queryLogDTO) {
         JSONObject data = new JSONObject();
         data.put("key","你好呢宝贝");
         log.info("执行方法");
-        return ResultBody.ok(data);
+        return ResultBody.ok(backendMenuService.list());
     }
 
     @LocalCacheEvent(keyPrefix = "testCache")

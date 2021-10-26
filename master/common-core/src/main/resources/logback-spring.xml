@@ -109,7 +109,7 @@
         </filter>
     </appender>
 
-    <logger name="com.emulate" level="debug" />
+    <logger name="com.emulate" level="INFO" />
     <logger name="org.apache.shardingsphere" level="INFO" />
 
     <root level="info">

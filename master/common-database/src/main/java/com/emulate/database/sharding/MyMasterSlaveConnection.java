@@ -2,6 +2,7 @@ package com.emulate.database.sharding;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.shardingjdbc.jdbc.core.connection.MasterSlaveConnection;
 
 import javax.sql.DataSource;
@@ -14,302 +15,313 @@ import java.util.concurrent.Executor;
  * 定义自己的数据库连接,用于替换原来的连接
  * 做sharding降级
  */
+@Slf4j
 @Getter
 @Setter
 public class MyMasterSlaveConnection implements Connection {
-
-    private final MasterSlaveConnection masterSlaveConnection;
 
     private final Map<String, DataSource> dataSourceMap;
 
     private Connection connection;
 
-    public MyMasterSlaveConnection(MasterSlaveConnection masterSlaveConnection, Map<String, DataSource> dataSourceMap) {
-        this.masterSlaveConnection = masterSlaveConnection;
+    private final static  ThreadLocal<Connection> local = new ThreadLocal<>();
+
+    public MyMasterSlaveConnection(Connection connection, Map<String, DataSource> dataSourceMap) {
+        this.connection = connection;
         this.dataSourceMap = dataSourceMap;
-        createNativeConnection();
     }
 
     /**
      * 获取原生的数据库链接
      */
-    public void createNativeConnection(){
+    public Connection createNativeConnection() throws SQLException {
         try {
+            Connection connection = local.get();
+            if(connection == null) {
+                connection = dataSourceMap.get("master").getConnection();
+                local.set(connection);
+            }
             //默认使用主库原生连接进行数据库异常降级
-            connection = dataSourceMap.get("master").getConnection();
-        }catch (SQLException throwables) {
-            throwables.printStackTrace();
-            //获取数据库连失败
+            return connection;
+        }catch (SQLException troubles) {
+            log.info("数据库连接获取失败");
+            throw troubles;
         }
     }
 
     @Override
     public Statement createStatement() throws SQLException {
-        return masterSlaveConnection.createStatement();
+        try {
+            return connection.createStatement();
+        }catch (Exception e){
+            return createNativeConnection().createStatement();
+        }
+
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return masterSlaveConnection.prepareStatement(sql);
+        return connection.prepareStatement(sql);
+
     }
 
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
-        return masterSlaveConnection.prepareCall(sql);
+        return connection.prepareCall(sql);
     }
 
     @Override
     public String nativeSQL(String sql) throws SQLException {
-        return masterSlaveConnection.nativeSQL(sql);
+        return connection.nativeSQL(sql);
     }
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-       masterSlaveConnection.setAutoCommit(autoCommit);
+        connection.setAutoCommit(autoCommit);
     }
 
     @Override
     public boolean getAutoCommit() throws SQLException {
-        return masterSlaveConnection.getAutoCommit();
+        return connection.getAutoCommit();
     }
 
     @Override
     public void commit() throws SQLException {
-        masterSlaveConnection.commit();
+        connection.commit();
     }
 
     @Override
     public void rollback() throws SQLException {
-        masterSlaveConnection.rollback();
+        connection.rollback();
     }
 
     @Override
     public void close() throws SQLException {
-        masterSlaveConnection.close();
+        connection.close();
     }
 
     @Override
     public boolean isClosed() throws SQLException {
-        return masterSlaveConnection.isClosed();
+        return connection.isClosed();
     }
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        return  masterSlaveConnection.getMetaData();
+        return  connection.getMetaData();
     }
 
     @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
-        masterSlaveConnection.setReadOnly(readOnly);
+        connection.setReadOnly(readOnly);
     }
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        return masterSlaveConnection.isReadOnly();
+        return connection.isReadOnly();
     }
 
     @Override
     public void setCatalog(String catalog) throws SQLException {
-         masterSlaveConnection.setCatalog(catalog);
+        connection.setCatalog(catalog);
     }
 
     @Override
     public String getCatalog() throws SQLException {
-        return masterSlaveConnection.getCatalog();
+        return connection.getCatalog();
     }
 
     @Override
     public void setTransactionIsolation(int level) throws SQLException {
-        masterSlaveConnection.setTransactionIsolation(level);
+        connection.setTransactionIsolation(level);
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        return masterSlaveConnection.getTransactionIsolation();
+        return connection.getTransactionIsolation();
     }
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        return masterSlaveConnection.getWarnings();
+        return connection.getWarnings();
     }
 
     @Override
     public void clearWarnings() throws SQLException {
-         masterSlaveConnection.clearWarnings();
+        connection.clearWarnings();
     }
 
     @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        return masterSlaveConnection.createStatement(resultSetType,resultSetConcurrency);
+        return connection.createStatement(resultSetType,resultSetConcurrency);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return masterSlaveConnection.prepareStatement(sql,resultSetType,resultSetConcurrency);
+        return connection.prepareStatement(sql,resultSetType,resultSetConcurrency);
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return masterSlaveConnection.prepareCall(sql,resultSetType,resultSetConcurrency);
+        return connection.prepareCall(sql,resultSetType,resultSetConcurrency);
     }
 
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        return masterSlaveConnection.getTypeMap();
+        return connection.getTypeMap();
     }
 
     @Override
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        masterSlaveConnection.setTypeMap(map);
+        connection.setTypeMap(map);
     }
 
     @Override
     public void setHoldability(int holdability) throws SQLException {
-        masterSlaveConnection.setHoldability(holdability);
+        connection.setHoldability(holdability);
     }
 
     @Override
     public int getHoldability() throws SQLException {
-        return masterSlaveConnection.getHoldability();
+        return connection.getHoldability();
     }
 
     @Override
     public Savepoint setSavepoint() throws SQLException {
-        return masterSlaveConnection.setSavepoint();
+        return connection.setSavepoint();
     }
 
     @Override
     public Savepoint setSavepoint(String name) throws SQLException {
-        return masterSlaveConnection.setSavepoint(name);
+        return connection.setSavepoint(name);
     }
 
     @Override
     public void rollback(Savepoint savepoint) throws SQLException {
-        masterSlaveConnection.rollback(savepoint);
+        connection.rollback(savepoint);
     }
 
     @Override
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        masterSlaveConnection.releaseSavepoint(savepoint);
+        connection.releaseSavepoint(savepoint);
     }
 
     @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return masterSlaveConnection.createStatement(resultSetType,resultSetConcurrency,resultSetHoldability);
+        return connection.createStatement(resultSetType,resultSetConcurrency,resultSetHoldability);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return masterSlaveConnection.prepareStatement(sql,resultSetType,resultSetConcurrency);
+        return connection.prepareStatement(sql,resultSetType,resultSetConcurrency);
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return masterSlaveConnection.prepareCall(sql,resultSetType,resultSetConcurrency);
+        return connection.prepareCall(sql,resultSetType,resultSetConcurrency);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
-        return masterSlaveConnection.prepareStatement(sql,autoGeneratedKeys);
+        return connection.prepareStatement(sql,autoGeneratedKeys);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
-        return masterSlaveConnection.prepareStatement(sql,columnIndexes);
+        return connection.prepareStatement(sql,columnIndexes);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
-        return masterSlaveConnection.prepareStatement(sql,columnNames);
+        return connection.prepareStatement(sql,columnNames);
     }
 
     @Override
     public Clob createClob() throws SQLException {
-        return masterSlaveConnection.createClob();
+        return connection.createClob();
     }
 
     @Override
     public Blob createBlob() throws SQLException {
-        return masterSlaveConnection.createBlob();
+        return connection.createBlob();
     }
 
     @Override
     public NClob createNClob() throws SQLException {
-        return masterSlaveConnection.createNClob();
+        return connection.createNClob();
     }
 
     @Override
     public SQLXML createSQLXML() throws SQLException {
-        return masterSlaveConnection.createSQLXML();
+        return connection.createSQLXML();
     }
 
     @Override
     public boolean isValid(int timeout) throws SQLException {
-        return masterSlaveConnection.isValid(timeout);
+        return connection.isValid(timeout);
     }
 
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
-        masterSlaveConnection.setClientInfo(name,value);
+        connection.setClientInfo(name,value);
     }
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        masterSlaveConnection.setClientInfo(properties);
+        connection.setClientInfo(properties);
     }
 
     @Override
     public String getClientInfo(String name) throws SQLException {
-        return masterSlaveConnection.getClientInfo(name);
+        return connection.getClientInfo(name);
     }
 
     @Override
     public Properties getClientInfo() throws SQLException {
-        return masterSlaveConnection.getClientInfo();
+        return connection.getClientInfo();
     }
 
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-        return masterSlaveConnection.createArrayOf(typeName,elements);
+        return connection.createArrayOf(typeName,elements);
     }
 
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        return masterSlaveConnection.createStruct(typeName,attributes);
+        return connection.createStruct(typeName,attributes);
     }
 
     @Override
     public void setSchema(String schema) throws SQLException {
-        masterSlaveConnection.setSchema(schema);
+        connection.setSchema(schema);
     }
 
     @Override
     public String getSchema() throws SQLException {
-        return masterSlaveConnection.getSchema();
+        return connection.getSchema();
     }
 
     @Override
     public void abort(Executor executor) throws SQLException {
-        masterSlaveConnection.abort(executor);
+        connection.abort(executor);
     }
 
     @Override
     public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-        masterSlaveConnection.setNetworkTimeout(executor,milliseconds);
+        connection.setNetworkTimeout(executor,milliseconds);
     }
 
     @Override
     public int getNetworkTimeout() throws SQLException {
-        return masterSlaveConnection.getNetworkTimeout();
+        return connection.getNetworkTimeout();
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return masterSlaveConnection.unwrap(iface);
+        return connection.unwrap(iface);
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return masterSlaveConnection.isWrapperFor(iface);
+        return connection.isWrapperFor(iface);
     }
 }
